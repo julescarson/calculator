@@ -6,7 +6,7 @@ const ansText = document.createElement('text');
 
 
 
-calcText.oninput = function () { equals() };
+// calcText.oninput = function () { equals() };
 
 
 calcText.setAttribute('type', 'text');
@@ -22,8 +22,13 @@ content.appendChild(ansText);
 
 let acceptableKeys = [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`, `.`, `/`, `*`, `-`, `+`, `Enter`, `Delete`, `(`, ')'];
 let operators = [`/`, `*`, `+`];
+let brackets = ['(', `)`];
+let minus = [`-`];
 let equationString = ``;
 let equationArray = [];
+
+
+//acceptable keys as object, include arrays inside
 
 
 
@@ -61,7 +66,8 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `-`:
-
+                keyToStr(` ${e.key} `);
+                showEq();
                 break;
 
             case `(`:
@@ -71,6 +77,8 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `.`:
+                keyToStr(` ${e.key} `);
+                showEq();
                 break;
             case `Delete`:
             case `Backspace`:
@@ -78,19 +86,11 @@ document.addEventListener('keydown', (e) => {
             case `Enter`:
                 if (!operators.includes(lastKey())) {
                     showEq();
-                    console.log(equationString);
                     equationArray = equationString.split(` `);
-
-                    //drop remaining ` ` spaces
                     dropSpaces(equationArray);
-                    doMath(equationArray);
-
-
+                    arrToNums(equationArray);
+                    console.log(equationArray);
                 }
-
-
-
-                //fn call to do the math
 
                 break;
             default:
@@ -98,20 +98,24 @@ document.addEventListener('keydown', (e) => {
 
         }
 
-
-
     }
 
 
 });
 
+//keypress related
+function keyToStr(k) { equationString += k; }
+function showEq() { ansText.textContent = equationString; }
+function lastKey() { return equationString[(equationString.length - 2)]; }
 
 
+//clear calculator
 function newEquation() {
 
 }
 
 
+// arrays of operator indices
 let bL = findOpIndex(`(`, equationArray);
 let bR = findOpIndex(`)`, equationArray);
 let e = findOpIndex(`^`, equationArray);
@@ -119,6 +123,7 @@ let d = findOpIndex(`/`, equationArray);
 let m = findOpIndex(`*`, equationArray);
 let a = findOpIndex(`+`, equationArray);
 let s = findOpIndex(`-`, equationArray);
+
 
 
 //find indices where passed operator occurs
@@ -132,63 +137,62 @@ function findOpIndex(op, arr) {
     return opIndices;
 }
 
-
-
-
-
-
-
-function doMath(arr) {
-
-
-}
-
-
-function keyToStr(k) {
-    equationString += k;
-}
-
-function showEq() {
-    ansText.textContent = equationString;
-}
-function lastKey() {
-    return equationString[(equationString.length - 2)];
-}
-
+//drop spaces
 function dropSpaces(arr) {
     for (i = 0; i < arr.length; i++) {
         if (arr[i] == ``) {
             console.log(i);
+            arr.splice(i, 1);
         }
     }
+    return arr;
 }
 
-// BEDMAS
-
-
-
-
-
-
-// add
-function plus(x, y) {
-    return x + y;
+//typecast numbers
+function arrToNums(arr) {
+    for (i = 0; i < arr.length; i++) {
+        if (!operators.includes(arr[i]) && !brackets.includes(arr[i])) {
+            arr[i] = Number(arr[i]);
+        }
+    }
+    return arr;
 }
 
-// subtract
-function minus(x, y) {
-    return x - y;
+
+
+// *************** MATH ****************** //
+
+// brackets
+
+// exponents
+
+// division
+function divide(x, y) {
+    return x / y;
 }
 
-// multiply
+// multiplication
 function times(x, y) {
     return x * y;
 }
 
-// divide
-function divide(x, y) {
-    return x / y;
+// addition
+function plus(x, y) {
+    return x + y;
 }
+
+// subtraction
+function subtract(x, y) {
+    return x - y;
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -210,7 +214,3 @@ function divide(x, y) {
 
 
 
-
-function operate(operation, n1, n2) {
-
-}
