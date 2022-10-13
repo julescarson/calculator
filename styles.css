@@ -1,4 +1,16 @@
 html,
 body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: gray;
+}
+
+.calcDisplay {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    background: white;
+    height: 12em;
+    width: 24em;
 }

@@ -1,7 +1,7 @@
 
 // DOM
 const content = document.querySelector('.content');
-const calcText = document.createElement('input');
+const calcText = document.createElement('div');
 const ansText = document.createElement('text');
 
 
@@ -9,23 +9,24 @@ const ansText = document.createElement('text');
 // calcText.oninput = function () { equals() };
 
 
-calcText.setAttribute('type', 'text');
+
 calcText.classList.add('calcDisplay');
 content.appendChild(calcText);
 
 
 ansText.setAttribute('type', 'text');
 ansText.classList.add('ansText');
-content.appendChild(ansText);
+calcText.appendChild(ansText);
 
 
 
 let acceptableKeys = [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`, `.`, `/`, `*`, `-`, `+`, `Enter`, `Delete`, `(`, ')'];
-let operators = [`/`, `*`, `+`];
+let operators = [`/`, `*`, `+`, '-'];
 let brackets = ['(', `)`];
-let minus = [`-`];
 let equationString = ``;
 let equationArray = [];
+
+
 
 
 //acceptable keys as object, include arrays inside
@@ -34,9 +35,9 @@ let equationArray = [];
 
 
 let enterKey = true;
+let allowDecimal = true;
 
 document.addEventListener('keydown', (e) => {
-
 
     if (acceptableKeys.includes(e.key)) {
 
@@ -59,15 +60,19 @@ document.addEventListener('keydown', (e) => {
             case '+':
             case `*`:
             case `/`:
-                if (!operators.includes(lastKey())) {
+                if (!operators.includes(lastKey(2))) {
                     keyToStr(` ${e.key} `);
                     showEq();
+                    allowDecimal = true;
                 }
                 break;
 
             case `-`:
-                keyToStr(` ${e.key} `);
-                showEq();
+                if (lastKey(5) != `-`) {
+                    keyToStr(` ${e.key} `);
+                    showEq();
+                    allowDecimal = true;
+                }
                 break;
 
             case `(`:
@@ -77,19 +82,36 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `.`:
-                keyToStr(` ${e.key} `);
+                if (allowDecimal) {
+                    keyToStr(e.key);
+                    allowDecimal = false;
+
+                }
+
+
+                //check decimal in prev 
+
+
+                console.log(equationString);
+
+
                 showEq();
                 break;
             case `Delete`:
             case `Backspace`:
                 break;
             case `Enter`:
-                if (!operators.includes(lastKey())) {
+                if (!operators.includes(lastKey(2))) {
                     showEq();
                     equationArray = equationString.split(` `);
                     dropSpaces(equationArray);
                     arrToNums(equationArray);
                     console.log(equationArray);
+
+                    //brackets
+                    newBL = Array.from(bL());
+                    newBR = Array.from(bR());
+                    b(newBL, newBR);
                 }
 
                 break;
@@ -106,18 +128,13 @@ document.addEventListener('keydown', (e) => {
 //keypress related
 function keyToStr(k) { equationString += k; }
 function showEq() { ansText.textContent = equationString; }
-function lastKey() { return equationString[(equationString.length - 2)]; }
+function lastKey(n) { return equationString[(equationString.length - n)]; }
 
 
-//clear calculator
-function newEquation() {
-
-}
 
 
 // arrays of operator indices
-let bL = findOpIndex(`(`, equationArray);
-let bR = findOpIndex(`)`, equationArray);
+
 let e = findOpIndex(`^`, equationArray);
 let d = findOpIndex(`/`, equationArray);
 let m = findOpIndex(`*`, equationArray);
@@ -160,9 +177,78 @@ function arrToNums(arr) {
 
 
 
+
+
 // *************** MATH ****************** //
 
 // brackets
+
+let newBL = [];
+let newBR = [];
+
+
+const bL = () => findOpIndex(`(`, equationArray);
+const bR = () => findOpIndex(`)`, equationArray);
+
+function b(l, r) {
+    let innerCalc = [];
+
+
+
+
+    //inner brackets
+    for (i = equationArray.lastIndexOf('(') + 1; i < equationArray.indexOf(')'); i++) {
+        let temp = []
+        //console.log(i);
+        //check for operators     
+        let a = plus(equationArray[i - 1], equationArray[i + 1]);
+        switch (equationArray[i]) {
+
+            case `^`:
+                break;
+            case `/`:
+                //console.log(`${equationArray[i - 1]} ${equationArray[i]} ${equationArray[i + 1]}`)
+
+                break;
+            case `*`:
+                break;
+            case `-`:
+                break;
+            case `+`:
+
+                console.log(a);
+                return a;
+                break;
+
+            default:
+                break;
+        }
+        console.log(`a ${a}`);
+
+
+
+    }
+
+    //for (i=equationArray[l.length]; i < equationArray[r.length]; i++)
+
+
+
+
+    // for (i = l.length; i < r[0]; i++) {
+    //     console.log(i);
+    //     innerCalc.push(equationsArray[i]);
+    // }
+    // console.log(innerCalc);
+    return innerCalc;
+}
+
+
+
+
+
+
+
+
 
 // exponents
 
@@ -200,7 +286,7 @@ function subtract(x, y) {
 
 // clear
 
-// additional operators?
+// additional operators? pi, sin, cos, tan, exp, ln, root, e, 
 
 // ico url gfx
 
