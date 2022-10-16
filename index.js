@@ -19,6 +19,18 @@ ansText.classList.add('ansText');
 calcText.appendChild(ansText);
 
 
+//acceptable calculator buttons
+const calcBtn = {
+    numKeys: [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`],
+    operations: [`/`, `*`, `+`, '-'],
+    brackets: ['(', `)`],
+    functions: [`Enter`, `Delete`],
+
+}
+
+const allKeys = calcBtn.brackets + calcBtn.functions + calcBtn.numKeys + calcBtn.operations;
+
+
 
 let acceptableKeys = [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`, `.`, `/`, `*`, `-`, `+`, `Enter`, `Delete`, `(`, ')'];
 let operators = [`/`, `*`, `+`, '-'];
@@ -28,19 +40,16 @@ let equationArray = [];
 
 
 
-
-//acceptable keys as object, include arrays inside
-
-
-
-
 let enterKey = true;
 let allowDecimal = true;
 
+
+
+Object.entries(calcBtn);
+
 document.addEventListener('keydown', (e) => {
 
-    if (acceptableKeys.includes(e.key)) {
-
+    if (allKeys.includes(e.key)) {
 
         switch (e.key) {
             case `9`:
@@ -53,6 +62,10 @@ document.addEventListener('keydown', (e) => {
             case `2`:
             case `1`:
             case `0`:
+                //multiply against closing brace
+                if (lastKey(2) == ')') {
+                    keyToStr(` * `);
+                }
                 keyToStr(e.key);
                 showEq();
                 break;
@@ -60,14 +73,20 @@ document.addEventListener('keydown', (e) => {
             case '+':
             case `*`:
             case `/`:
-                if (!operators.includes(lastKey(2))) {
-                    keyToStr(` ${e.key} `);
-                    showEq();
-                    allowDecimal = true;
+                //don't start here
+                if (equationString >= 1) {
+                    //disallow successive operators
+                    if (!calcBtn.operations.includes(lastKey(2))) {
+                        keyToStr(` ${e.key} `);
+                        showEq();
+                        allowDecimal = true;
+                        console.log('true');
+                    }
                 }
                 break;
 
             case `-`:
+
                 if (lastKey(5) != `-`) {
                     keyToStr(` ${e.key} `);
                     showEq();
@@ -76,32 +95,39 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `(`:
-            case `)`:
+                //insert * multiplying braces         
+                if (lastKey(2) == `)` || calcBtn.numKeys.includes(lastKey(2))) {
+                    keyToStr(` * `);
+                }
                 keyToStr(` ${e.key} `);
                 showEq();
+                break;
+
+            case `)`:
+                //no empty braces, don't start on closed
+                if (equationString.length >= 1 && lastKey(2) != '(') {
+                    keyToStr(` ${e.key} `);
+                    showEq();
+                }
                 break;
 
             case `.`:
                 if (allowDecimal) {
                     keyToStr(e.key);
                     allowDecimal = false;
-
                 }
-
-
                 //check decimal in prev 
-
-
                 console.log(equationString);
-
-
                 showEq();
                 break;
+
             case `Delete`:
             case `Backspace`:
+                //remove fn?
                 break;
+
             case `Enter`:
-                if (!operators.includes(lastKey(2))) {
+                if (!calcBtn.operations.includes(lastKey(2))) {
                     showEq();
                     equationArray = equationString.split(` `);
                     dropSpaces(equationArray);
@@ -124,6 +150,8 @@ document.addEventListener('keydown', (e) => {
 
 
 });
+//syntax error display?
+
 
 //keypress related
 function keyToStr(k) { equationString += k; }
@@ -134,7 +162,6 @@ function lastKey(n) { return equationString[(equationString.length - n)]; }
 
 
 // arrays of operator indices
-
 let e = findOpIndex(`^`, equationArray);
 let d = findOpIndex(`/`, equationArray);
 let m = findOpIndex(`*`, equationArray);
@@ -201,7 +228,11 @@ function b(l, r) {
         let temp = []
         //console.log(i);
         //check for operators     
-        let a = plus(equationArray[i - 1], equationArray[i + 1]);
+
+
+
+
+
         switch (equationArray[i]) {
 
             case `^`:
@@ -217,7 +248,7 @@ function b(l, r) {
             case `+`:
 
                 console.log(a);
-                return a;
+                return plus(equationArray[i - 1], equationArray[i + 1]);
                 break;
 
             default:
