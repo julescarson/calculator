@@ -1,3 +1,26 @@
+ops = [
+    {
+        name: "add",
+        math: function add(x, y) { return x + y; },
+        symb: `+`,
+    },
+    {
+        name: "subtract",
+        math: function add(x, y) { return x - y; },
+        symb: `-`,
+    },
+    {
+        name: "multiply",
+        math: function add(x, y) { return x * y; },
+        symb: `*`,
+    },
+    {
+        name: "divide",
+        math: function add(x, y) { return x / y; },
+        symb: `/`,
+    },
+];
+
 let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
 
 
@@ -25,28 +48,82 @@ array of arrays?
 
 
 let arr2 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`];
+let arr3 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`, `)`];
 console.log(arr2);
 
+//STACK SYSTEM
+// [ [io, index, stack_n] ,[...]
+let stackIndicePairs = [];
 
-function inner(arr) {
+function stack(arr) {
     let stackCounter = 0;
-    let stackIndicePairs = [];
-    let index = 0;
+    let open = 0;
+    let close = 0;
 
-    arr.forEach(e => {
-        index += 1;
-        if (e == `(`) {
+    for (i = 0; i < arr.length; i++) {
+
+        if (arr[i] == `(`) {
+            open++;
             stackCounter += 1;
-            stackIndicePairs.push([`open`, stackCounter, index]);
-        } else if (e == `)`) {
-            stackIndicePairs.push([`close`, stackCounter, index]);
+            stackIndicePairs.push([`open`, i, stackCounter]);
+        } else if (arr[i] == `)`) {
+            close++;
+            stackIndicePairs.push([`close`, i, stackCounter]);
             stackCounter -= 1
         }
-    });
+    }
+    //error checking 
+    if (open != close) {
+        console.log(`brackets uneven`)
+        stackIndicePairs = [];
+        return;
+    }
     console.log(stackIndicePairs);
+
+
 }
 
-inner(arr2);
+stack(arr2);
+
+
+let ind = [];
+function indexFromStack(stacksArr) {
+    let currentStack = 0;
+    let outerIndex = [0, 0];
+    stacksArr.forEach(e => {
+        if (e[2] > currentStack) {
+            currentStack = e[2];
+        }
+
+        if (currentStack == e[2]) {
+
+            if (e[0] == `open`) {
+                outerIndex.splice(0, 1, (e[1]));
+            }
+            if (e[0] == `close`) {
+                outerIndex.splice(1, 1, (e[1]));
+            }
+
+        }
+
+    });
+    ind = outerIndex;
+    console.log(outerIndex);
+
+}
+
+
+indexFromStack(stackIndicePairs);
+
+function mathOnIndex(eqArr, indArr) {
+    //HOW TO MATH?
+    for (i = indArr[0] + 1; i < indArr[1]; i++) {
+        eqOps(eqArr);
+    }
+
+}
+
+mathOnIndex(arr1, ind);
 
 
 
@@ -55,29 +132,6 @@ inner(arr2);
 
 
 
-
-ops = [
-    {
-        name: "add",
-        math: function add(x, y) { return x + y; },
-        symb: `+`,
-    },
-    {
-        name: "subtract",
-        math: function add(x, y) { return x - y; },
-        symb: `-`,
-    },
-    {
-        name: "multiply",
-        math: function add(x, y) { return x * y; },
-        symb: `*`,
-    },
-    {
-        name: "divide",
-        math: function add(x, y) { return x / y; },
-        symb: `/`,
-    },
-];
 
 //pass eq array, check all values against obj operators, do math thing for each operator
 function eqOps(arr) {
