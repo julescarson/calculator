@@ -4,15 +4,8 @@ const content = document.querySelector('.content');
 const calcText = document.createElement('div');
 const ansText = document.createElement('text');
 
-
-
-// calcText.oninput = function () { equals() };
-
-
-
 calcText.classList.add('calcDisplay');
 content.appendChild(calcText);
-
 
 ansText.setAttribute('type', 'text');
 ansText.classList.add('ansText');
@@ -24,33 +17,22 @@ const calcBtn = {
     numKeys: [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`],
     operations: [`/`, `*`, `+`, '-'],
     brackets: ['(', `)`],
-    functions: [`Enter`, `Delete`],
-
+    functions: [`Enter`, `Delete`, `Backspace`],
+    get allKeys() {
+        return this.numKeys + this.operations + this.brackets + this.functions;
+    },
 }
 
-const allKeys = calcBtn.brackets + calcBtn.functions + calcBtn.numKeys + calcBtn.operations;
-
-
-
-let acceptableKeys = [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`, `.`, `/`, `*`, `-`, `+`, `Enter`, `Delete`, `(`, ')'];
-let operators = [`/`, `*`, `+`, '-'];
-let brackets = ['(', `)`];
 let equationString = ``;
 let equationArray = [];
-
-
-
 let enterKey = true;
 let allowDecimal = true;
 
 
 
-Object.entries(calcBtn);
-
 document.addEventListener('keydown', (e) => {
 
-    if (allKeys.includes(e.key)) {
-
+    if (calcBtn.allKeys.includes(e.key)) {
         switch (e.key) {
             case `9`:
             case `8`:
@@ -73,24 +55,21 @@ document.addEventListener('keydown', (e) => {
             case '+':
             case `*`:
             case `/`:
-                //don't start here
-                if (equationString >= 1) {
-                    //disallow successive operators
-                    if (!calcBtn.operations.includes(lastKey(2))) {
-                        keyToStr(` ${e.key} `);
-                        showEq();
-                        allowDecimal = true;
-                        console.log('true');
-                    }
+                //not after (, not first, not twice in a row
+                if ((lastKey(2) != '(') && (equationString.length >= 1) && (!calcBtn.operations.includes(lastKey(2)))) {
+                    keyToStr(` ${e.key} `);
+                    showEq();
+                    allowDecimal = true;
                 }
                 break;
 
             case `-`:
-
                 if (lastKey(5) != `-`) {
                     keyToStr(` ${e.key} `);
                     showEq();
                     allowDecimal = true;
+                } else if (lastKey(2) == `-`) {
+
                 }
                 break;
 
@@ -124,6 +103,10 @@ document.addEventListener('keydown', (e) => {
             case `Delete`:
             case `Backspace`:
                 //remove fn?
+                console.log('backspace');
+                equationString = removeLast(equationString);
+                showEq();
+
                 break;
 
             case `Enter`:
@@ -150,13 +133,23 @@ document.addEventListener('keydown', (e) => {
 
 
 });
-//syntax error display?
+//syntax error display
+//clear button!!
+
 
 
 //keypress related
 function keyToStr(k) { equationString += k; }
 function showEq() { ansText.textContent = equationString; }
 function lastKey(n) { return equationString[(equationString.length - n)]; }
+
+//add second argument ?
+function removeLast(str) {
+    let temp = str.split('');
+    temp.splice(temp.length - 1, 1);
+    return temp.join('');
+}
+
 
 
 
@@ -195,7 +188,7 @@ function dropSpaces(arr) {
 //typecast numbers
 function arrToNums(arr) {
     for (i = 0; i < arr.length; i++) {
-        if (!operators.includes(arr[i]) && !brackets.includes(arr[i])) {
+        if (!calcBtn.operations.includes(arr[i]) && !calcBtn.brackets.includes(arr[i])) {
             arr[i] = Number(arr[i]);
         }
     }
