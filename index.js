@@ -12,7 +12,7 @@ ansText.classList.add('ansText');
 calcText.appendChild(ansText);
 
 
-//acceptable calculator buttons
+//buttons obj
 const calcBtn = {
     numKeys: [`9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, `1`, `0`],
     operations: [`/`, `*`, `+`, '-'],
@@ -27,6 +27,7 @@ let equationString = ``;
 let equationArray = [];
 let enterKey = true;
 let allowDecimal = true;
+let brackets = false;
 
 
 
@@ -64,13 +65,13 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `-`:
+                //not 3 in a row
                 if (lastKey(5) != `-`) {
                     keyToStr(` ${e.key} `);
                     showEq();
                     allowDecimal = true;
-                } else if (lastKey(2) == `-`) {
-
                 }
+
                 break;
 
             case `(`:
@@ -80,6 +81,7 @@ document.addEventListener('keydown', (e) => {
                 }
                 keyToStr(` ${e.key} `);
                 showEq();
+                brackets = true;
                 break;
 
             case `)`:
@@ -91,18 +93,17 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `.`:
+                //check for decimals already
                 if (allowDecimal) {
                     keyToStr(e.key);
                     allowDecimal = false;
                 }
-                //check decimal in prev 
                 console.log(equationString);
                 showEq();
                 break;
 
             case `Delete`:
             case `Backspace`:
-                //remove fn?
                 console.log('backspace');
                 equationString = removeLast(equationString);
                 showEq();
@@ -110,17 +111,23 @@ document.addEventListener('keydown', (e) => {
                 break;
 
             case `Enter`:
-                if (!calcBtn.operations.includes(lastKey(2))) {
+                //last not '(', last not operator, same number opening closes braces
+                if ((lastKey(2) != `(`) && (!calcBtn.operations.includes(lastKey(2)))) {
                     showEq();
+
+                    //cleaning up array we will use to calculate
                     equationArray = equationString.split(` `);
                     dropSpaces(equationArray);
                     arrToNums(equationArray);
+                    doubleNegative(equationArray);
                     console.log(equationArray);
 
-                    //brackets
-                    newBL = Array.from(bL());
-                    newBR = Array.from(bR());
-                    b(newBL, newBR);
+
+
+                    // while array conatains brackets -> brackets() call
+
+
+                    // do math on no bracket array
                 }
 
                 break;
@@ -133,52 +140,38 @@ document.addEventListener('keydown', (e) => {
 
 
 });
-//syntax error display
+//error messages?
 //clear button!!
 
 
 
-//keypress related
+//onkeypress related
 function keyToStr(k) { equationString += k; }
 function showEq() { ansText.textContent = equationString; }
 function lastKey(n) { return equationString[(equationString.length - n)]; }
 
-//add second argument ?
+//backspace/delete key
 function removeLast(str) {
     let temp = str.split('');
     temp.splice(temp.length - 1, 1);
     return temp.join('');
 }
 
-
-
-
-
-// arrays of operator indices
-let e = findOpIndex(`^`, equationArray);
-let d = findOpIndex(`/`, equationArray);
-let m = findOpIndex(`*`, equationArray);
-let a = findOpIndex(`+`, equationArray);
-let s = findOpIndex(`-`, equationArray);
-
-
-
-//find indices where passed operator occurs
-function findOpIndex(op, arr) {
-    let opIndices = [];
+//double negative
+function doubleNegative(arr) {
     for (i = 0; i < arr.length; i++) {
-        if (arr[i] == op) {
-            opIndices.push(i);
+        if (arr[i] == `-` && arr[i + 1] == `-`) {
+            //@index, n remove, replace value
+            arr.splice(i, 2, `+`)
         }
     }
-    return opIndices;
+    return arr;
 }
 
 //drop spaces
 function dropSpaces(arr) {
     for (i = 0; i < arr.length; i++) {
         if (arr[i] == ``) {
-            console.log(i);
             arr.splice(i, 1);
         }
     }
@@ -201,112 +194,85 @@ function arrToNums(arr) {
 
 // *************** MATH ****************** //
 
-// brackets
-
-let newBL = [];
-let newBR = [];
-
-
-const bL = () => findOpIndex(`(`, equationArray);
-const bR = () => findOpIndex(`)`, equationArray);
-
-function b(l, r) {
-    let innerCalc = [];
-
-
-
-
-    //inner brackets
-    for (i = equationArray.lastIndexOf('(') + 1; i < equationArray.indexOf(')'); i++) {
-        let temp = []
-        //console.log(i);
-        //check for operators     
+/// while (arr contains brackets, loop through, remove inner)
 
 
 
 
 
-        switch (equationArray[i]) {
 
-            case `^`:
-                break;
-            case `/`:
-                //console.log(`${equationArray[i - 1]} ${equationArray[i]} ${equationArray[i + 1]}`)
 
-                break;
-            case `*`:
-                break;
-            case `-`:
-                break;
-            case `+`:
 
-                console.log(a);
-                return plus(equationArray[i - 1], equationArray[i + 1]);
-                break;
+function mathOrder(arr) {
 
-            default:
-                break;
+    //brace indices arrays
+    let opened = [];
+    let closed = [];
+
+    for (i = 0; i < arr.length; i++) {
+        if (arr[i] == ')') {
+            closed.push(i);
+        } else if (arr[i] == '(') {
+            opened.push(i);
         }
-        console.log(`a ${a}`);
-
-
-
     }
 
-    //for (i=equationArray[l.length]; i < equationArray[r.length]; i++)
+    let close = closed[0];
+    let open = new Number;
+
+    for (i = 0; i < closed.length; i++) {
+        if (opened[i] > closed[0]) {
+            open = opened[i - 1];
+        } else {
+            open = arr.lastIndexOf(`(`) + 1;
+        }
+    }
+
+    //test
+    console.log(opened);
+    console.log(closed);
+    console.log(`opened: ${open} closed: ${close}`);
 
 
 
 
-    // for (i = l.length; i < r[0]; i++) {
-    //     console.log(i);
-    //     innerCalc.push(equationsArray[i]);
-    // }
-    // console.log(innerCalc);
-    return innerCalc;
+    //iterate from inner most to next closing brace
+    for (i = open; i < close; i++) {
+
+
+
+
+
+
+        // switch (arr[i]) {
+        //     case `^`:
+        //         break;
+        //     case `/`:
+        //         break;
+        //     case `*`:
+        //         break;
+        //     case `-`:
+        //         break;
+
+        //     case `+`:                
+
+        //         break;
+
+        //     default:
+        //         break;
+
+        // }
+    }
+
+    console.log(arr);
+
 }
 
+// }
 
 
 
 
-
-
-
-
-// exponents
-
-// division
-function divide(x, y) {
-    return x / y;
-}
-
-// multiplication
-function times(x, y) {
-    return x * y;
-}
-
-// addition
-function plus(x, y) {
-    return x + y;
-}
-
-// subtraction
-function subtract(x, y) {
-    return x - y;
-}
-
-
-
-
-
-
-
-
-
-
-
-// equals
 
 // clear
 
@@ -319,8 +285,4 @@ function subtract(x, y) {
 // second display for results
 
 // github / connect projects?
-
-
-
-
 

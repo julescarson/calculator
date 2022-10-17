@@ -4,7 +4,7 @@ To do..
 
 to disallow:
 (+ keypress
-() keypress
+
 can't start on )
 
 
@@ -18,6 +18,6 @@ begin with decimal -> change to 0 or disallow
 
 alter functionality:
 )( : multiply
--- : assign negative
+-- : assign positive, unless begins with -> remove entirely
 
 
