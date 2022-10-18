@@ -1,4 +1,10 @@
 ops = [
+
+    {
+        name: "divide",
+        math: function add(x, y) { return x / y; },
+        symb: `/`,
+    },
     {
         name: "add",
         math: function add(x, y) { return x + y; },
@@ -14,11 +20,7 @@ ops = [
         math: function add(x, y) { return x * y; },
         symb: `*`,
     },
-    {
-        name: "divide",
-        math: function add(x, y) { return x / y; },
-        symb: `/`,
-    },
+
 ];
 
 
@@ -40,15 +42,21 @@ ops = [
 
 */
 
-//test eq arrays
+//TESTING
+let test_reQuation = true;
+let test_once = true;
+
+
+
+//eq array examples
 let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
 let arr2 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`];
 let arr3 = [`(`, 55, `+`, 45, `(`, 9, `-`, 7, `(`, 85, `-`, 17, `)`, `*`, 6, `)`, `)`];
 let arr4 = [`(`, 55, `+`, 45, `)`, 9, `-`, 7, `(`, 85, `-`, 17, `)`]
-
+let arr5 = ['(', 55, '+', 45, ')', 9, '-', 7, '*', 68]
 
 //itialize vars
-let stackIndicePairs = []; // [ [io, index, stack_n] ,[...]
+let stackIndicePairs = []; // [[io, index, stack_n],...,[]]
 let ind = [];
 let blockAns = 0;
 let blockLength = 0;
@@ -57,12 +65,13 @@ let check = true;
 
 
 //first pass
-let ARR = Array.from(arr4);
+let ARR = Array.from(arr1);
 doMath(ARR);
 
 
 function logVars() {
     console.log(arr4);
+    console.log(ARR);
     console.log(stackIndicePairs);
     console.log(ind);
     console.log(blockLength);
@@ -142,6 +151,7 @@ function mathOnIndex(eqArr, indArr) {
 function eqOps(arr) {
     arr.forEach(e => {
         for (i = 0; i < ops.length; i++) {
+            // console.log(ops[i].name);
             if (ops[i].symb == e) {
                 arrMath(arr, ops[i].math, ops[i].symb);
             }
@@ -163,62 +173,110 @@ function arrMath(arr, mathfn, opsymbol) {
         arr.splice(0, 1);
     }
 
-    blockAns = arr;
+
+    blockAns = arr[0];
 
 }
 
 
 
 function reQuation(arr, index, length, ans) {
-    console.log(`index`, index, `length`, length, `ans`, ans);
-
-    let removeOpen = (replace) => { arr.splice(index[0], replace); }
-    let removeClose = (replace) => { arr.splice(index[0] + length - 1, 1, replace) }
-
-    arr.splice(index[0] + 1, length, ans[0]);
+    let openPos = index[0];
+    let closePos = index[1];
 
 
+    if (test_reQuation) {
+        console.log(`\nequation passed:`, arr,
+        );
+        console.log(
+            `\nbraces start, end:`, index,
+            `\nlength-brackets:`, length,
+            `\nequals:`, ans
+        );
+        console.log(
+            `\nopen:`, arr[openPos], `index`, index[0],
+            `\nclose:`, arr[closePos], `index`, index[1],
+            `\nvalue to left:`, (arr[openPos - 1]), `type to left:`, typeof (arr[openPos - 1]),
+            `\nvalue to right:`, (arr[closePos + 1]), `type to right:`, typeof (arr[closePos + 1]),
+        )
+    }
 
-    console.log(`left:`, typeof (arr[index[0] - 1]));
-    console.log(`right:`, typeof (arr[index[0] + length]));
 
-    switch (typeof arr[index[0] + length]) {
+
+    //splice(start, deletecount, replace1,2,3,....)
+    let replaceClose = (replace) => { arr.splice(closePos, 1, replace); }
+    let removeClose = () => { arr.splice(closePos, 1) }
+
+    let replaceOpen = (replace) => { arr.splice(openPos, 1, replace); }
+    let removeOpen = () => { arr.splice(openPos, 1); }
+
+
+
+
+    //close
+    switch (typeof arr[closePos + 1]) {
         case `string`:
-            removeClose(1)
+            removeClose();
             break;
         case `number`:
-            removeClose(`*`);
+            replaceClose(`*`);
             break;
         case `undefined`:
-            removeClose(1);
+            removeClose();
         default:
             break;
     }
 
-    switch (typeof arr[index[0] - 1]) {
+    //open
+    switch (typeof arr[openPos - 1]) {
         case `string`:
-            removeOpen(1);
+            removeOpen();
             break;
         case `number`:
-            console.log(`before`, arr)
-            arr.splice(index[0], 1, `*`);
-            console.log(arr);
+            replaceOpen(`*`);
             break;
         case `undefined`:
-            removeOpen(1);
+            removeOpen();
         default:
             break;
     }
 
 
-    if (check) {
-        check = false;
-        if (arr.includes(`()`)) {
-            console.log(`works`);
-        }
-        doMath(arr);
+    //splice in answer     
+    arr.splice(openPos, 1, ans);
+
+    //end test
+    if (test_reQuation) {
+        console.log(`\nequation after:`, arr,
+        );
+        console.log(
+            `\nbraces start, end:`, index,
+            `\nlength-brackets:`, length,
+            `\nequals:`, ans
+        );
+        console.log(
+            `\nopen value:`, arr[openPos], `index`, index[0],
+            `\nclose:`, arr[closePos], `index`, index[1],
+            `\nvalue to left:`, (arr[openPos - 1]), `type to left:`, typeof (arr[openPos - 1]),
+            `\nvalue to right:`, (arr[closePos + 1]), `type to right:`, typeof (arr[closePos + 1]),
+        )
     }
 
 
+
+
+    // if (arr.includes(`(`)) {
+    // if (test_once) {
+    //     test_once = false;
+    //     doMath(arr);
+    // }
+    // // }
+
+
+
+}
+
+
+function solveFinal(ARR) {
 
 }
