@@ -33,6 +33,7 @@ let brackets = false;
 
 document.addEventListener('keydown', (e) => {
 
+
     if (calcBtn.allKeys.includes(e.key)) {
         switch (e.key) {
             case `9`:

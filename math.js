@@ -48,12 +48,33 @@ array of arrays?
 
 
 let arr2 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`];
-let arr3 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`, `)`];
-console.log(arr2);
+let arr3 = [`(`, 55, `+`, 45, `(`, 12, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`, `)`];
 
-//STACK SYSTEM
-// [ [io, index, stack_n] ,[...]
-let stackIndicePairs = [];
+
+
+
+let stackIndicePairs = []; // [ [io, index, stack_n] ,[...]
+let ind = [];
+let blockAns = new Number;
+let blockLength = new Number;
+
+doMath(arr3);
+
+
+function logVars() {
+    console.log(arr1, arr2, arr3);
+    console.log(stackIndicePairs);
+    console.log(ind);
+    console.log(blockLength);
+
+}
+
+function doMath(arr) {
+    stack(arr);
+    indexFromStack(stackIndicePairs);
+    mathOnIndex(arr, ind);
+    reQuation(arr, ind, blockLength, blockAns);
+}
 
 function stack(arr) {
     let stackCounter = 0;
@@ -79,14 +100,8 @@ function stack(arr) {
         return;
     }
     console.log(stackIndicePairs);
-
-
 }
 
-stack(arr2);
-
-
-let ind = [];
 function indexFromStack(stacksArr) {
     let currentStack = 0;
     let outerIndex = [0, 0];
@@ -112,28 +127,17 @@ function indexFromStack(stacksArr) {
 
 }
 
-
-indexFromStack(stackIndicePairs);
-
 function mathOnIndex(eqArr, indArr) {
-    //HOW TO MATH?
-    for (i = indArr[0] + 1; i < indArr[1]; i++) {
-        eqOps(eqArr);
+    let blockArr = [];
+    blockLength = 0;
+    for (i = indArr[0]; i < indArr[1] - 1; i++) {
+        blockArr.push(eqArr[i + 1]);
+        blockLength++;
     }
-
+    eqOps(blockArr);
 }
 
-mathOnIndex(arr1, ind);
-
-
-
-
-
-
-
-
-
-//pass eq array, check all values against obj operators, do math thing for each operator
+//check math symbols
 function eqOps(arr) {
     arr.forEach(e => {
         for (i = 0; i < ops.length; i++) {
@@ -143,13 +147,10 @@ function eqOps(arr) {
         }
     });
 }
-//continue doing math things until all operators gone
-while (arr1.length >= 3) {
-    eqOps(arr1);
-}
-console.table(arr1);
 
+//make calculations
 function arrMath(arr, mathfn, opsymbol) {
+
     for (i = 0; i <= arr.length; i++) {
         if (arr[i] == opsymbol) {
             let operate = mathfn(arr[i - 1], arr[i + 1]);
@@ -159,11 +160,37 @@ function arrMath(arr, mathfn, opsymbol) {
     if (arr.length == 3) {
         arr.splice(2, 1);
         arr.splice(0, 1);
-    } else {
-        //console.log(`error`);
     }
-
-    return arr;
+    console.log(arr);
+    blockAns = arr[0];
+    return blockAns;
 }
 
-console.log(arr1);
+function reQuation(arr, index, length, ans) {
+    console.log(arr);
+    let removeOpen = () => { arr.splice(index[0], 1); }
+
+    console.log(`index, length, ans`);
+    console.log(index[0], length, ans);
+    console.log(arr[index[0] + 1 + length]);
+
+    arr.splice(index[0] + 1, length, ans);
+    console.log(arr[index[0] - 1]);
+
+    console.log(arr[index[0] + length])
+
+    //braces logic
+    if (arr[index[0] - 1] == typeof Number) {
+        arr.splice(index[0], 1, `*`);
+    } else if (arr[index[0] - 1] == undefined) {
+        removeOpen();
+    } else {
+        removeOpen();
+    }
+    console.log(arr[index[0] + 1 + length]);
+    console.log(arr);
+    return arr;
+
+
+}
+
