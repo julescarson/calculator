@@ -21,20 +21,14 @@ ops = [
     },
 ];
 
-let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
 
 
 
-/*
-stacks
 
-1. count opening braces, add 1 to some stack counter for each, remove 1 for each close
+/* stacks
 
-2. ONREMOVE -> create new array between indices where 
-stack counter last increased and last decreased
-
-array of arrays?
-
+1. count opening braces, add 1 to some stack counter for each
+2. create new array between indices where stack counter same
 3. section of larger of larger EQ has *math* done on it
 
 4/3/2.5? add (splice?) array back into larger eq AND remove external braces
@@ -46,84 +40,91 @@ array of arrays?
 
 */
 
-
+//test eq arrays
+let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
 let arr2 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`];
-let arr3 = [`(`, 55, `+`, 45, `(`, 12, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`, `)`];
+let arr3 = [`(`, 55, `+`, 45, `(`, 9, `-`, 7, `(`, 85, `-`, 17, `)`, `*`, 6, `)`, `)`];
+let arr4 = [`(`, 55, `+`, 45, `)`, 9, `-`, 7, `(`, 85, `-`, 17, `)`]
 
 
-
-
+//itialize vars
 let stackIndicePairs = []; // [ [io, index, stack_n] ,[...]
 let ind = [];
-let blockAns = new Number;
-let blockLength = new Number;
+let blockAns = 0;
+let blockLength = 0;
+let currentStack = 0;
+let check = true;
 
-doMath(arr3);
+
+//first pass
+let ARR = Array.from(arr4);
+doMath(ARR);
 
 
 function logVars() {
-    console.log(arr1, arr2, arr3);
+    console.log(arr4);
     console.log(stackIndicePairs);
     console.log(ind);
     console.log(blockLength);
+}
+
+function clearVars() {
+    stackIndicePairs = [];
+    ind = [];
+    blockAns = 0;
+    blockLength = 0;
+    currentStack = 0;
 
 }
 
+//fn's req for calc
 function doMath(arr) {
+    clearVars();
     stack(arr);
     indexFromStack(stackIndicePairs);
     mathOnIndex(arr, ind);
     reQuation(arr, ind, blockLength, blockAns);
 }
 
+
+//array of arrays for stacks []
 function stack(arr) {
-    let stackCounter = 0;
     let open = 0;
     let close = 0;
 
-    for (i = 0; i < arr.length; i++) {
 
+    for (i = 0; i < arr.length; i++) {
         if (arr[i] == `(`) {
             open++;
-            stackCounter += 1;
-            stackIndicePairs.push([`open`, i, stackCounter]);
+            stackIndicePairs.push([`open`, i, open]);
         } else if (arr[i] == `)`) {
             close++;
-            stackIndicePairs.push([`close`, i, stackCounter]);
-            stackCounter -= 1
+            stackIndicePairs.push([`close`, i, close]);
         }
     }
-    //error checking 
-    if (open != close) {
-        console.log(`brackets uneven`)
-        stackIndicePairs = [];
-        return;
-    }
-    console.log(stackIndicePairs);
+
 }
 
+//array index  pair of current stack []
 function indexFromStack(stacksArr) {
-    let currentStack = 0;
-    let outerIndex = [0, 0];
+
     stacksArr.forEach(e => {
         if (e[2] > currentStack) {
             currentStack = e[2];
         }
-
         if (currentStack == e[2]) {
-
             if (e[0] == `open`) {
-                outerIndex.splice(0, 1, (e[1]));
+
+                ind.splice(0, 1, (e[1]));
             }
             if (e[0] == `close`) {
-                outerIndex.splice(1, 1, (e[1]));
+
+                ind.splice(1, 1, (e[1]));
             }
-
         }
-
     });
-    ind = outerIndex;
-    console.log(outerIndex);
+
+
 
 }
 
@@ -161,36 +162,63 @@ function arrMath(arr, mathfn, opsymbol) {
         arr.splice(2, 1);
         arr.splice(0, 1);
     }
-    console.log(arr);
-    blockAns = arr[0];
-    return blockAns;
+
+    blockAns = arr;
+
 }
+
+
 
 function reQuation(arr, index, length, ans) {
-    console.log(arr);
-    let removeOpen = () => { arr.splice(index[0], 1); }
+    console.log(`index`, index, `length`, length, `ans`, ans);
 
-    console.log(`index, length, ans`);
-    console.log(index[0], length, ans);
-    console.log(arr[index[0] + 1 + length]);
+    let removeOpen = (replace) => { arr.splice(index[0], replace); }
+    let removeClose = (replace) => { arr.splice(index[0] + length - 1, 1, replace) }
 
-    arr.splice(index[0] + 1, length, ans);
-    console.log(arr[index[0] - 1]);
+    arr.splice(index[0] + 1, length, ans[0]);
 
-    console.log(arr[index[0] + length])
 
-    //braces logic
-    if (arr[index[0] - 1] == typeof Number) {
-        arr.splice(index[0], 1, `*`);
-    } else if (arr[index[0] - 1] == undefined) {
-        removeOpen();
-    } else {
-        removeOpen();
+
+    console.log(`left:`, typeof (arr[index[0] - 1]));
+    console.log(`right:`, typeof (arr[index[0] + length]));
+
+    switch (typeof arr[index[0] + length]) {
+        case `string`:
+            removeClose(1)
+            break;
+        case `number`:
+            removeClose(`*`);
+            break;
+        case `undefined`:
+            removeClose(1);
+        default:
+            break;
     }
-    console.log(arr[index[0] + 1 + length]);
-    console.log(arr);
-    return arr;
+
+    switch (typeof arr[index[0] - 1]) {
+        case `string`:
+            removeOpen(1);
+            break;
+        case `number`:
+            console.log(`before`, arr)
+            arr.splice(index[0], 1, `*`);
+            console.log(arr);
+            break;
+        case `undefined`:
+            removeOpen(1);
+        default:
+            break;
+    }
+
+
+    if (check) {
+        check = false;
+        if (arr.includes(`()`)) {
+            console.log(`works`);
+        }
+        doMath(arr);
+    }
+
 
 
 }
-
