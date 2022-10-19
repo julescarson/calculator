@@ -57,17 +57,12 @@ let badarr1 = [55, `+`, `+`, 5];
 let badarr2 = [55, `(`, `)`, 5];
 let badarr3 = [55, `(`, `-`, 5];
 
-let ARR = Array.from(badarr3); // <---
+let ARR = Array.from(arr4); // <---
 
 let _result = new Number;
 let opAns = new Number;
 let opcounter = new Number;
 let orderlevel = 1;
-
-
-
-
-
 parseEq(ARR);
 
 function parseEq(arr) {
@@ -118,10 +113,9 @@ function parseEq(arr) {
     }
 }
 
-
-
-
 function order(arr) {
+    let osymb = operations[orderlevel - 1].symb;
+
     if (test) {
         console.log(orderlevel, arr)
     }
@@ -132,11 +126,13 @@ function order(arr) {
         let op = arr[i];
         operate(arr, i - 1, value1, value2, op, orderlevel);
     }
-
+    //order symbol loop
+    while (arr.includes(osymb)) {
+        console.log('includes', osymb);
+        order(arr);
+    }
+    //order level loop
     while (orderlevel < 5) {
-        while (arr.includes(operations[orderlevel - 1].symb)) {
-            order(arr);
-        }
         orderlevel++;
         order(arr);
     }
