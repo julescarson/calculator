@@ -23,29 +23,19 @@ ops = [
 
 ];
 
-
-
-
-
-/* stacks
-
-1. count opening braces, add 1 to some stack counter for each
-2. create new array between indices where stack counter same
-3. section of larger of larger EQ has *math* done on it
-
-4/3/2.5? add (splice?) array back into larger eq AND remove external braces
- AND account for 'assumed' operators in their place
-
-5. repeat until stack count is 0
-
+/* ---------------------- STACKS ----------------------------
+1. count braces, add 1 to right and left counters for braces
+2. evaluate between indices where stack counters same level
+3. section has *math* done on it
+4. splice back into larger eq AND remove braces
+5. account for '*' operators if brace beside Number
+5. repeat until stack count is 0 ~ or single index array ~
 6. return a Number
-
-*/
+------------------------------------------------------------*/
 
 //TESTING
 let test_reQuation = true;
 let test_once = true;
-
 
 
 //eq array examples
@@ -56,7 +46,7 @@ let arr4 = [`(`, 55, `+`, 45, `)`, 9, `-`, 7, `(`, 85, `-`, 17, `)`]
 let arr5 = ['(', 55, '+', 45, ')', 9, '-', 7, '*', 68]
 
 //itialize vars
-let stackIndicePairs = []; // [[io, index, stack_n],...,[]]
+let stackIndicePairs = []; // [[open/close, index, stack_number],...,[]]
 let ind = [];
 let blockAns = 0;
 let blockLength = 0;
@@ -261,22 +251,6 @@ function reQuation(arr, index, length, ans) {
             `\nvalue to right:`, (arr[closePos + 1]), `type to right:`, typeof (arr[closePos + 1]),
         )
     }
-
-
-
-
-    // if (arr.includes(`(`)) {
-    // if (test_once) {
-    //     test_once = false;
-    //     doMath(arr);
-    // }
-    // // }
-
-
-
 }
 
 
-function solveFinal(ARR) {
-
-}

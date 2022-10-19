@@ -48,18 +48,79 @@ const test = true;
 let arr1 = [55, `+`, 45, `-`, 85, `-`, 12, `*`, 6];
 let arr2 = [55, `+`, 45, `-`, 12];
 let arr3 = [45, `*`, 1, `-`, 7];
-let arr4 = [9, `/`, 3]
-let arr5 = [8, `^`, 2]
-let arr6 = [2, `^`, 2, `*`, 3]
+let arr4 = [9, `/`, 3];
+let arr5 = [8, `^`, 2];
+let arr6 = [2, `^`, 2, `*`, 3];
 let arr7 = [100, `-`, 72];
 
+let badarr1 = [55, `+`, `+`, 5];
+let badarr2 = [55, `(`, `)`, 5];
+let badarr3 = [55, `(`, `-`, 5];
+
+let ARR = Array.from(badarr3); // <---
+
 let _result = new Number;
-let ARR = Array.from(arr1);
 let opAns = new Number;
 let opcounter = new Number;
 let orderlevel = 1;
 
-order(ARR);
+
+
+
+
+parseEq(ARR);
+
+function parseEq(arr) {
+    let error = false;
+    let checker = arr;
+    let str = checker.join(``);
+    let testChars = [`+`, `*`, `/`, `^`]
+    let rbrace = 0;
+    let lbrace = 0;
+
+    if (test) {
+        console.log(
+            `str:`, str
+        );
+    }
+
+
+    for (i = 0; i < str.length; i++) {
+        //double operators
+        if ((testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i - 1))) ||
+            (testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i + 1)))) {
+            error = true;
+            return error;
+        }
+        //brace & operators
+        if (str.charAt(i) == `(` && testChars.includes(str.charAt(i + 1))) {
+            error = true;
+            return error;
+        }
+        if (str.charAt(i) == `)` && testChars.includes(str.charAt(i - 1))) {
+            error = true;
+            return error;
+        }
+        if (str.charAt(i) == `)`) { rbrace++; }
+        if (str.charAt(i) == `(`) { lbrace++; }
+
+    }
+
+    //empty braces, uneven brace number
+    if (str.includes(`()`) || rbrace != lbrace) {
+        error = true;
+        return error;
+    }
+
+
+    if (error === false) {
+        order(ARR);
+    }
+}
+
+
+
+
 function order(arr) {
     if (test) {
         console.log(orderlevel, arr)
@@ -69,7 +130,6 @@ function order(arr) {
         let value1 = Number([arr[i - 1]]);
         let value2 = Number([arr[i + 1]]);
         let op = arr[i];
-
         operate(arr, i - 1, value1, value2, op, orderlevel);
     }
 
