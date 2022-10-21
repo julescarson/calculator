@@ -46,7 +46,6 @@ let arr4 = [9, `/`, 3];
 let arr5 = [8, `^`, 2];
 let arr6 = [2, `^`, 2, `*`, 3];
 let arr7 = [100, `-`, 72];
-
 let badarr1 = [55, `+`, `+`, 5];
 let badarr2 = [55, `(`, `)`, 5];
 let badarr3 = [55, `(`, `-`, 5];
@@ -62,7 +61,6 @@ let orderlevel = 1;
 
 //run it
 parseEq(ARR);
-
 
 //validity check -> calculate or throw error
 function parseEq(arr) {

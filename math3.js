@@ -44,10 +44,10 @@ operations = [
 ------------------------------------------------------------*/
 
 //TESTING
+const test = true;
 let testing = true;
 let test_reQuation = false;
 let test_once = true;
-
 
 
 //array tests
@@ -63,20 +63,26 @@ let arr9 = [9, `/`, 3];
 let arr10 = [8, `^`, 2];
 let arr11 = [2, `^`, 2, `*`, 3];
 let arr12 = [100, `-`, 72];
+let badarr1 = [55, `+`, `+`, 5];
+let badarr2 = [55, `(`, `)`, 5];
+let badarr3 = [55, `(`, `-`, 5];
 
 //itialize vars
 let stacksArr = []; // [`open/close, index (original pos in equation), stack number]
 let cstacks = []
-
 let pairArr = [];
 let pairs = [];
 let blockAns = 0;
 let blockLength = 0;
 let currentStack = 0;
 let check = true;
+let _result = new Number;
+let opAns = new Number;
+let opcounter = new Number;
+let orderlevel = 1;
 
 
-
+/*----------------------------------------- BEGIN ------------------------ */
 
 //first pass
 let ARR = Array.from(arr3); // pass to (arr) in f'ns always
@@ -296,25 +302,9 @@ function reQuation(arr, index, length, ans) {
 
 
 
+/************************************ MATH 2 WAS HERE *****************************/
 
 
-//test
-const test = true;
-
-
-
-let badarr1 = [55, `+`, `+`, 5];
-let badarr2 = [55, `(`, `)`, 5];
-let badarr3 = [55, `(`, `-`, 5];
-
-//equation array -> new array that we modify
-let ARR = Array.from(arr4); // <---
-
-//vars
-let _result = new Number;
-let opAns = new Number;
-let opcounter = new Number;
-let orderlevel = 1;
 
 //run it
 parseEq(ARR);

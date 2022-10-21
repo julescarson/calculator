@@ -1,24 +1,34 @@
-ops = [
-
+//bedmas
+operations = [
     {
-        name: "divide",
-        math: function add(x, y) { return x / y; },
-        symb: `/`,
+        name: "exp",
+        math: function exp(x, y) { return x ** y; },
+        symb: `^`,
+        order: 1,
     },
     {
-        name: "add",
+        name: `division`,
+        math: function divide(x, y) { return x / y; },
+        symb: `/`,
+        order: 2,
+    },
+    {
+        name: `multiplication`,
+        math: function times(x, y) { return x * y; },
+        symb: `*`,
+        order: 3,
+    },
+    {
+        name: `addition`,
         math: function add(x, y) { return x + y; },
         symb: `+`,
+        order: 4,
     },
     {
-        name: "subtract",
-        math: function add(x, y) { return x - y; },
+        name: `subtraction`,
+        math: function subtract(x, y) { return x - y; },
         symb: `-`,
-    },
-    {
-        name: "multiply",
-        math: function add(x, y) { return x * y; },
-        symb: `*`,
+        order: 5,
     },
 
 ];
@@ -33,10 +43,11 @@ ops = [
 6. return a Number
 ------------------------------------------------------------*/
 
-//TESTING
-let testing = true;
-let test_reQuation = false;
-let test_once = true;
+// TESTING 
+const testing = true;
+const test_recreateEq = false;
+const test_once = true;
+const test = true;
 
 
 
@@ -49,51 +60,42 @@ let arr5 = ['(', 55, '+', 45, ')', 9, '-', 7, '*', 68]
 
 //itialize vars
 let stacksArr = []; // [`open/close, index (original pos in equation), stack number]
-let cstacks = []
-
-let pairArr = [];
+//let cstacks = []
 let pairs = [];
 let blockAns = 0;
 let blockLength = 0;
 let currentStack = 0;
 let check = true;
 
-
-
+//vars
+let result = new Number;
+let opAns = new Number;
+let opcounter = new Number;
+let orderlevel = 1;
 
 //first pass
-let ARR = Array.from(arr3); // pass to (arr) in f'ns always
-
+let ARR = Array.from(arr3);
 if (testing) {
     console.table(ARR);
 }
 
-doMath(ARR);
-
-//output
-function logVars() {
-    console.log(arr4);
-    console.log(ARR);
-    console.log(stacksArr);
-    console.log(pairArr);
-    console.log(blockLength);
-}
+//attempt
+parseEq(ARR);
 
 //reset
 function clearVars() {
     stacksArr = [];
-    pairArr = [];
     blockAns = 0;
     blockLength = 0;
     currentStack = 0;
 
 }
 
-//fn's req for calc -- validation should go here
-function doMath(arr) {
+//fn's req'd - validation should go here
+function parseEq(arr) {
     stack(arr);
     prepareStack(arr, pairs);
-    reQuation(arr, pairArr, blockLength, blockAns);
+    order()
 }
 
 //creates stackPairs[`open/close`, index, stacknum]
@@ -148,7 +150,7 @@ function indexPair(arr) {
     });
 }
 
-//new array for stack only
+//block[] = new array for stack only 
 function prepareStack(arr, pair) {
     let block = [];
     let currentPair = pair[0]; //in case more than 1 @ same stack level
@@ -156,70 +158,110 @@ function prepareStack(arr, pair) {
 
     // [o,c] indices, find length between for original arr
     // push in between values to new separate stack 
-    for (i = pair[0][0]; i < pair[1] - 1; i++) {
+    for (i = pair[0][0]; i < pair[0][1] - 1; i++) {
         block.push(arr[i + 1]);
         blockLength++;
     }
-    eqOps(block);
+    console.log(block);
+    parseBlock(block);
 }
 
-//MATH2 FIXES
-//check math symbols (MATH2: order() 'of operations')
-function eqOps(arr) {
-    arr.forEach(e => {
-        for (i = 0; i < ops.length; i++) {
-            // console.log(ops[i].name);
-            if (ops[i].symb == e) {
-                arrMath(arr, ops[i].math, ops[i].symb);
-            }
+//validity check -> calculate or throw error
+function parseBlock(arr) {
+    let error = false;
+    let checker = arr;
+    let str = checker.join(``);
+    let testChars = [`+`, `*`, `/`, `^`]
+    let rbrace = 0;
+    let lbrace = 0;
+
+    if (testing) {
+        console.log(
+            `str:`, str,
+            `block:`, arr,
+        );
+    }
+
+
+    for (i = 0; i < str.length; i++) {
+        //double operators
+        if ((testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i - 1))) ||
+            (testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i + 1)))) {
+            error = true;
+            return error;
+        }
+        //brace & operators
+        if (str.charAt(i) == `(` && testChars.includes(str.charAt(i + 1))) {
+            error = true;
+            return error;
+        }
+        if (str.charAt(i) == `)` && testChars.includes(str.charAt(i - 1))) {
+            error = true;
+            return error;
+        }
+        if (str.charAt(i) == `)`) { rbrace++; }
+        if (str.charAt(i) == `(`) { lbrace++; }
+
+    }
+
+    //empty braces, uneven brace number
+    if (str.includes(`()`) || rbrace != lbrace) {
+        error = true;
+        return error;
+    }
+
+    //equation passed/failed valid check
+    if (error === false) {
+        order(arr);
+    } else {
+        return 0;
+    }
+}
+
+//operator hierarchy
+function order(arr) {
+    let osymb = operations[orderlevel - 1].symb;
+
+    if (test) {
+        console.log(`orderlevel`, orderlevel,
+            `arr (block)`, arr)
+    }
+
+    for (i = 0; i < arr.length; i++) {
+
+        let value1 = Number([arr[i - 1]]);
+        let value2 = Number([arr[i + 1]]);
+        let op = arr[i];
+        operate(arr, i - 1, value1, value2, op, orderlevel);
+    }
+    //order symbol loop
+    while (arr.includes(osymb)) {
+        console.log('includes', osymb);
+        order(arr);
+    }
+    //order level loop
+    while (orderlevel < 5) {
+        orderlevel++;
+        order(arr);
+    }
+    result = arr[0];
+}
+
+//do math
+function operate(arr, index, x, y, operator, hierarchy) {
+    operations.forEach(e => {
+        if (operator == e.symb && e.order == hierarchy) {
+            opAns = e.math(x, y);
+            arr.splice(index, 3, opAns);
         }
     });
 }
 
-//OPERATE MATH2 FIXES
-//make calculations
-function arrMath(arr, mathfn, opsymbol) {
-
-    for (i = 0; i <= arr.length; i++) {
-        if (arr[i] == opsymbol) {
-            let operate = mathfn(arr[i - 1], arr[i + 1]);
-            arr.splice(i - 1, 3, operate);
-        }
-    }
-    if (arr.length == 3) {
-        arr.splice(2, 1);
-        arr.splice(0, 1);
-    }
-
-
-    blockAns = arr[0];
-
-}
-
-
-//REWRITE MATH2
-function reQuation(arr, index, length, ans) {
+//update eq after doing math on a block
+//old args : arr, index, length, ans 
+function recreateEq(arr, bresult, length, ans) {
     let openPos = index[0];
     let closePos = index[1];
-
-
-    if (test_reQuation) {
-        console.log(`\nequation passed:`, arr,
-        );
-        console.log(
-            `\nbraces start, end:`, index,
-            `\nlength-brackets:`, length,
-            `\nequals:`, ans
-        );
-        console.log(
-            `\nopen:`, arr[openPos], `index`, index[0],
-            `\nclose:`, arr[closePos], `index`, index[1],
-            `\nvalue to left:`, (arr[openPos - 1]), `type to left:`, typeof (arr[openPos - 1]),
-            `\nvalue to right:`, (arr[closePos + 1]), `type to right:`, typeof (arr[closePos + 1]),
-        )
-    }
-
-
 
     //splice(start, deletecount, replace1,2,3,....)
     let replaceClose = (replace) => { arr.splice(closePos, 1, replace); }
@@ -227,9 +269,6 @@ function reQuation(arr, index, length, ans) {
 
     let replaceOpen = (replace) => { arr.splice(openPos, 1, replace); }
     let removeOpen = () => { arr.splice(openPos, 1); }
-
-
-
 
     //close
     switch (typeof arr[closePos + 1]) {
@@ -258,27 +297,13 @@ function reQuation(arr, index, length, ans) {
         default:
             break;
     }
-
-
     //splice in answer     
     arr.splice(openPos, 1, ans);
 
-    //end test
-    if (test_reQuation) {
-        console.log(`\nequation after:`, arr,
-        );
-        console.log(
-            `\nbraces start, end:`, index,
-            `\nlength-brackets:`, length,
-            `\nequals:`, ans
-        );
-        console.log(
-            `\nopen value:`, arr[openPos], `index`, index[0],
-            `\nclose:`, arr[closePos], `index`, index[1],
-            `\nvalue to left:`, (arr[openPos - 1]), `type to left:`, typeof (arr[openPos - 1]),
-            `\nvalue to right:`, (arr[closePos + 1]), `type to right:`, typeof (arr[closePos + 1]),
-        )
-    }
 }
 
 
+//---- end
+
+//         arr.splice(2, 1);
+//         arr.splice(0, 1);
