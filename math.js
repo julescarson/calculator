@@ -34,8 +34,10 @@ ops = [
 ------------------------------------------------------------*/
 
 //TESTING
+let testing = true;
 let test_reQuation = true;
 let test_once = true;
+
 
 
 //eq array examples
@@ -50,14 +52,26 @@ let stacksArr = []; // [`open/close, index (original pos in equation), stack num
 let cstacks = []
 
 let pairArr = [];
+let pairs = [];
 let blockAns = 0;
 let blockLength = 0;
 let currentStack = 0;
 let check = true;
 
+
+
+
 //first pass
-let ARR = Array.from(arr4); // pass to (arr) in f'ns always
+let ARR = Array.from(arr3); // pass to (arr) in f'ns always
+
+if (testing) {
+    console.table(ARR);
+}
+
 doMath(ARR);
+
+
+
 
 //output
 function logVars() {
@@ -85,67 +99,59 @@ function doMath(arr) {
     reQuation(arr, pairArr, blockLength, blockAns);
 }
 
-
 //creates stackPairs[`open/close`, index, stacknum]
 function stack(arr) {
-    // let open = 0;
-    // let close = 0;
     let cstack = 0;
-    let match = [];
-
-
     for (i = 0; i < arr.length; i++) {
         if (arr[i] == `(`) {
             cstack++;
             stacksArr.push([`open`, i, cstack]);
-            match.push([`index`, i, `stack`, cstack, `(`]);
-
-
         } else if (arr[i] == `)`) {
             stacksArr.push([`close`, i, cstack]);
-            match.push([`index`, i, `stack`, cstack, `)`]);
-
             cstack--;
         }
-
-
     }
-    console.log(`match`, match,
-        `\ncstack`, cstack);
-
     indexPair(stacksArr);
 }
 
-//use stackArr[] to create pairArr[open, close] (indices)
+//pairs [open, close] @ stack level
 function indexPair(arr) {
+    let opens = [];
+    let closes = [];
+    let highest = new Number;
+    console.table(arr);
 
-    stacksArr.forEach(e => {
-        let stacknum = e[2];
-        let inum = e[1]
-
-        //prioritize highest stacknum
-        if (stacknum > currentStack) {
-            currentStack = stacknum;
-        }
-
-        /// HJERAWEJRL:KASDJFG L:KASDJFG AL:SKDFGJ ---------------------*************************
-
-        console.log(`e`, e, e[2])
-
-
-        //set pairArr to [open_index, close_index] for current highest stacknum
-        if (currentStack == stacknum) {
-            if (e[0] == `open`) {
-                //pairArr.splice(0, 1, (e[1]));
-                pairArr.push([e[]])
-
-            }
-            if (e[0] == `close`) {
-                //pairArr.splice(1, 1, (e[1]));
-            }
+    arr.forEach(e => {
+        if (e[2] > highest) {
+            highest = e[2];
         }
     });
-    console.log(pairArr);
+
+    for (i = 0; i < arr.length; i++) {
+        if (arr[i][2] == highest) {
+            if (arr[i][0] == `open`) {
+                opens.push(arr[i][1]);
+            }
+            if (arr[i][0] == `close`) {
+                closes.push(arr[i][1]);
+            }
+        }
+    }
+    //[open,close] pair array    
+    //opening smaller than closing    
+    //no same open values (close logic covered in this case)
+    opens.forEach((o) => {
+        closes.forEach((c) => {
+            if (o < c) {
+                if (pairs[0] != o[0]) {
+                    pairs.push(o, c);
+                }
+                pairs.push([o, c]);
+            }
+        });
+    });
+    console.log(`pairs`, pairs);
+
 }
 
 
