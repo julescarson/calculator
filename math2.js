@@ -34,17 +34,11 @@ operations = [
 
 ];
 
-ops2 = {
-    exp: function exp(x, y) { return x ** y; },
-    divide: function divide(x, y) { return x / y; },
-    times: function times(x, y) { return x * y; },
-    add: function add(x, y) { return x + y; },
-    subtract: function subtract(x, y) { return x - y; },
-}
 
 //test
 const test = true;
 
+//array tests
 let arr1 = [55, `+`, 45, `-`, 85, `-`, 12, `*`, 6];
 let arr2 = [55, `+`, 45, `-`, 12];
 let arr3 = [45, `*`, 1, `-`, 7];
@@ -57,14 +51,20 @@ let badarr1 = [55, `+`, `+`, 5];
 let badarr2 = [55, `(`, `)`, 5];
 let badarr3 = [55, `(`, `-`, 5];
 
+//equation array -> new array that we modify
 let ARR = Array.from(arr4); // <---
 
+//vars
 let _result = new Number;
 let opAns = new Number;
 let opcounter = new Number;
 let orderlevel = 1;
+
+//run it
 parseEq(ARR);
 
+
+//validity check -> calculate or throw error
 function parseEq(arr) {
     let error = false;
     let checker = arr;
