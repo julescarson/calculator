@@ -113,6 +113,7 @@ function parseEq(arr) {
     }
 }
 
+//operator hierarchy
 function order(arr) {
     let osymb = operations[orderlevel - 1].symb;
 
@@ -150,6 +151,7 @@ function order(arr) {
     }
 }
 
+//do math!
 function operate(arr, index, x, y, operator, hierarchy) {
     operations.forEach(e => {
         if (operator == e.symb && e.order == hierarchy) {
