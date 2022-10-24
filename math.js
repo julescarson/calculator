@@ -264,8 +264,6 @@ function operate(arr, index, x, y, operator, hierarchy) {
     });
 }
 
-
-
 function reup(arr, result) {
 
 
@@ -322,7 +320,9 @@ function reup(arr, result) {
     if (npairs > 1) {
         parseEq(arr);
     }
-    console.log(arr[0]);
+    result = arr[0];
+    console.log(result);
+
 }
 
 //---- end
