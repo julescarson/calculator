@@ -55,13 +55,22 @@ const test = true;
 let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
 let arr2 = [`(`, 55, `+`, 45, `-`, `(`, 85, `-`, 12, `)`, `*`, 6, `)`];
 let arr3 = [`(`, 55, `+`, 45, `(`, 9, `-`, 7, `(`, 85, `-`, 17, `)`, `*`, 6, `)`, `)`];
-let arr4 = [`(`, 55, `+`, 45, `)`, 9, `-`, 7, `(`, 85, `-`, 17, `)`]
-let arr5 = ['(', 55, '+', 45, ')', 9, '-', 7, '*', 68]
+let arr4 = [`(`, 55, `+`, 45, `)`, 9, `-`, 7, `(`, 85, `-`, 17, `)`];
+let arr5 = ['(', 55, '+', 45, ')', 9, '-', 7, '*', 68];
+let arr6 = [2, `^`, `(`, 2, `*`, 3, `)`];
+let arr7 = [2, `^`, 2, `*`, 3];
+let arr8 = [6];
+let arr9 = ['(', '(', 55, '+', 45, '-', 73, '*', 6, ')', ')'];
+
+let badarr1 = [55, `+`, `+`, 5];
+let badarr2 = [55, `(`, `)`, 5];
+let badarr3 = [55, `(`, `-`, 5];
 
 //itialize vars
 let stacksArr = []; // [`open/close, index (original pos in equation), stack number]
-//let cstacks = []
-let pairs = [];
+let stackpair = [];
+let block = [];
+//let pairs = [];
 let blockAns = 0;
 let blockLength = 0;
 let currentStack = 0;
@@ -73,10 +82,15 @@ let opAns = new Number;
 let opcounter = new Number;
 let orderlevel = 1;
 
-//first pass
-let ARR = Array.from(arr3);
+//prep array
+let ARR = Array.from(arr4);
+//encapsulate in braces
+ARR.unshift(`(`);
+ARR.push(')');
+
+
 if (testing) {
-    console.table(ARR);
+    console.log(ARR);
 }
 
 //attempt
@@ -94,8 +108,7 @@ function clearVars() {
 //fn's req'd - validation should go here
 function parseEq(arr) {
     stack(arr);
-    prepareStack(arr, pairs);
-    order()
+    prepareStack(arr, stackpair);
 }
 
 //creates stackPairs[`open/close`, index, stacknum]
@@ -110,60 +123,64 @@ function stack(arr) {
             cstack--;
         }
     }
-    indexPair(stacksArr);
-}
+    // indexPair(stacksArr);
 
-//pairs [open, close] @ stack level
-function indexPair(arr) {
-    let opens = [];
-    let closes = [];
-    let highest = new Number;
+    let h = 0;
+    let cl = [];
+    let op = [];
+    let costack = [];
 
-    arr.forEach(e => {
-        if (e[2] > highest) {
-            highest = e[2];
+    stacksArr.forEach(e => {
+        if (e[0] == `open`) {
+            if (e[2] > h) {
+                h = e[2];
+            }
         }
     });
 
-    for (i = 0; i < arr.length; i++) {
-        if (arr[i][2] == highest) {
-            if (arr[i][0] == `open`) {
-                opens.push(arr[i][1]);
+    stacksArr.forEach(e => {
+        if (e[2] == h) {
+            if (e[0] == `close`) {
+                cl.push(e[1]);
+            } else if (e[0] == `open`) {
+                op.push(e[1]);
             }
-            if (arr[i][0] == `close`) {
-                closes.push(arr[i][1]);
-            }
+        }
+    });
+
+    let x2 = Math.min(...cl);
+    let x1 = 0;
+
+    for (i = 0; i < op.length; i++) {
+        if (op[i] > x1 && op[i] < x2) {
+            x1 = op[i];
         }
     }
-    //[open,close] pair array    
-    //opening smaller than closing    
-    //no same open values (close logic covered in this case)
-    opens.forEach((o) => {
-        closes.forEach((c) => {
-            if (o < c) {
-                if (pairs[0] != o[0]) {
-                    pairs.push(o, c);
-                }
-                pairs.push([o, c]);
-            }
-        });
-    });
+    stackpair = [x1, x2];
+    console.log(
+        `stackpair`, stackpair,
+        `arr`, arr,
+    )
 }
 
 //block[] = new array for stack only 
-function prepareStack(arr, pair) {
-    let block = [];
-    let currentPair = pair[0]; //in case more than 1 @ same stack level
+function prepareStack(arr) {
+
+
     blockLength = 0;
 
-    // [o,c] indices, find length between for original arr
-    // push in between values to new separate stack 
-    for (i = pair[0][0]; i < pair[0][1] - 1; i++) {
+
+
+    // [o,c] indices, find length between for original arr    
+    for (i = stackpair[0]; i < stackpair[1] - 1; i++) {
         block.push(arr[i + 1]);
         blockLength++;
     }
-    console.log(block);
     parseBlock(block);
+    console.log(
+        `block`, block,
+        `arr`, arr,
+    )
 }
 
 //validity check -> calculate or throw error
@@ -174,14 +191,6 @@ function parseBlock(arr) {
     let testChars = [`+`, `*`, `/`, `^`]
     let rbrace = 0;
     let lbrace = 0;
-
-    if (testing) {
-        console.log(
-            `str:`, str,
-            `block:`, arr,
-        );
-    }
-
 
     for (i = 0; i < str.length; i++) {
         //double operators
@@ -222,11 +231,6 @@ function parseBlock(arr) {
 function order(arr) {
     let osymb = operations[orderlevel - 1].symb;
 
-    if (test) {
-        console.log(`orderlevel`, orderlevel,
-            `arr (block)`, arr)
-    }
-
     for (i = 0; i < arr.length; i++) {
 
         let value1 = Number([arr[i - 1]]);
@@ -234,12 +238,11 @@ function order(arr) {
         let op = arr[i];
         operate(arr, i - 1, value1, value2, op, orderlevel);
     }
-    //order symbol loop
+    //order symbols at current hierarchy
     while (arr.includes(osymb)) {
-        console.log('includes', osymb);
         order(arr);
     }
-    //order level loop
+    //increment order level after all previous accounted for
     while (orderlevel < 5) {
         orderlevel++;
         order(arr);
@@ -257,53 +260,59 @@ function operate(arr, index, x, y, operator, hierarchy) {
     });
 }
 
-//update eq after doing math on a block
-//old args : arr, index, length, ans 
-function recreateEq(arr, bresult, length, ans) {
-    let openPos = index[0];
-    let closePos = index[1];
 
-    //splice(start, deletecount, replace1,2,3,....)
+function reup(arr, block) {
+    let npairs = (stacksArr.length) / 2;
+    let openPos = stackpair[0];
+    let closePos = stackpair[1];
+    let blength = stackpair[1] - stackpair[0] - 1;
+
+
+    // //splice(start, deletecount, replace1,2,3,....)
     let replaceClose = (replace) => { arr.splice(closePos, 1, replace); }
     let removeClose = () => { arr.splice(closePos, 1) }
-
     let replaceOpen = (replace) => { arr.splice(openPos, 1, replace); }
     let removeOpen = () => { arr.splice(openPos, 1); }
 
-    //close
-    switch (typeof arr[closePos + 1]) {
-        case `string`:
-            removeClose();
-            break;
-        case `number`:
-            replaceClose(`*`);
-            break;
-        case `undefined`:
-            removeClose();
-        default:
-            break;
+
+    if (npairs > 1) {
+        //close
+        switch (typeof arr[closePos + 1]) {
+            case `number`:
+                replaceClose(`*`);
+                break;
+            case `string`:
+            case `undefined`:
+            case undefined:
+                removeClose();
+            default:
+                break;
+        }
+        //insert result
+        arr.splice(openPos + 1, blength, block);
+
+        //open
+        switch (typeof arr[openPos - 1]) {
+            case `number`:
+                replaceOpen(`*`);
+                break;
+            case `string`:
+            case `undefined`:
+            case undefined:
+                removeOpen();
+            default:
+                break;
+        }
     }
 
-    //open
-    switch (typeof arr[openPos - 1]) {
-        case `string`:
-            removeOpen();
-            break;
-        case `number`:
-            replaceOpen(`*`);
-            break;
-        case `undefined`:
-            removeOpen();
-        default:
-            break;
-    }
-    //splice in answer     
-    arr.splice(openPos, 1, ans);
+
+
+
+
+
+
+
 
 }
 
-
 //---- end
-
-//         arr.splice(2, 1);
-//         arr.splice(0, 1);
