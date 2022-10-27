@@ -1,3 +1,4 @@
+
 //DOM
 const content = document.querySelector(`.content`);
 
@@ -23,19 +24,19 @@ const ckeys = [
   `(`,
   `)`,
   `÷`,
-  7,
-  8,
-  9,
+  `7`,
+  `8`,
+  `9`,
   `×`,
-  4,
-  5,
-  6,
+  `4`,
+  `5`,
+  `6`,
   `-`,
-  1,
-  2,
-  3,
+  `1`,
+  `2`,
+  `3`,
   `+`,
-  0,
+  `0`,
   `.`,
   `⌫`,
   `=`,
@@ -46,7 +47,7 @@ const qs = (s) => document.querySelector(s);
 function crdom(name, parent, cn, text) {
   let newdiv = document.createElement("div");
   newdiv.classList.add(name);
-  if (cn) newdiv.classList.add(cn);
+  if (cn) { newdiv.classList.add(cn) }
   qs(`.${parent}`).append(newdiv);
   newdiv.textContent = text;
 }
@@ -83,16 +84,31 @@ function updateTime() {
 
 // -- input --
 let eq = ``;
-let ops = [`^`, `/`, `*`, `+`, `-`, `=`];
+let allkeys = Array.from(ckeys);
+allkeys.push(`^`, `/`, `*`, `(`, `)`);
+let eqr = [];
+
+
 document.addEventListener("keydown", (e) => {
-  qs(`.eq`).textContent = eq;
-  if (!isNaN(Number(e.key)) || ops.includes(e.key)) {
+  if (allkeys.includes(e.key)) {
     eq = eq + e.key;
   }
   if (e.key == `Delete` || e.key == `Backspace`) {
     eq = eq.slice(0, eq.length - 1);
   }
   if (e.key == `Enter`) {
-    console.log(eq);
+    eqprep(eq)
+    console.log(eqr);
   }
+  qs(`.eq`).textContent = eq;
 });
+
+function eqprep(str) {
+  let opsregex = /([-+*^/()])/;
+  eqr = eq.split(opsregex);
+  let notempty = (e) => { return e != `` }
+  eqr = eqr.filter(notempty);
+}
+
+console.log(eqr);
+export { eqr };

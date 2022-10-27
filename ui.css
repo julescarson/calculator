@@ -86,12 +86,12 @@ img {
 }
 
 .eq {
-    font-size: 1.5em;
+    font-size: 1em;
     display: flex;
     justify-content: end;
     align-items: center;
     width: 97%;
-    height: 4em;
+    height: 114px;
 }
 
 .fnbar {
