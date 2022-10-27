@@ -81,11 +81,12 @@ let opcounter = new Number;
 let orderlevel = 1;
 
 //prep array
-let ARR = Array.from(arr4);
+let ARR = Array.from(arr7);
 //encapsulate in braces
 ARR.unshift(`(`);
 ARR.push(')');
 
+console.log(ARR);
 
 //attempt
 parseEq(ARR);
@@ -280,10 +281,6 @@ function reup(arr, result) {
     let removeClose = () => { arr.splice(closePos, 1) }
     let replaceOpen = (replace) => { arr.splice(openPos, 1, replace); }
     let removeOpen = () => { arr.splice(openPos, 1); }
-
-
-
-
 
     //close
     switch (typeof arr[closePos + 1]) {
