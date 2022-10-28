@@ -46,7 +46,9 @@ const qs = (s) => document.querySelector(s);
 function crdom(name, parent, cn, text) {
   let newdiv = document.createElement("div");
   newdiv.classList.add(name);
-  if (cn) { newdiv.classList.add(cn) }
+  if (cn) {
+    newdiv.classList.add(cn);
+  }
   qs(`.${parent}`).append(newdiv);
   newdiv.textContent = text;
 }
@@ -89,6 +91,7 @@ let allkeys = Array.from(ckeys);
 allkeys.push(`^`, `/`, `*`, `(`, `)`);
 let eqr = [];
 let runeq = false;
+let ans = qs(`.ans`).textContent;
 
 document.addEventListener("keydown", (e) => {
   inputkeys(e.key);
@@ -96,21 +99,20 @@ document.addEventListener("keydown", (e) => {
 
 qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
-})
+});
 
 function inputkeys(k) {
   let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
   let kto = [`Delete`, ``, `Enter`, `/`, `*`];
-  let runeq = false;
 
-
-
+  if (qs(`.ans`).textContent != ``) {
+    reset();
+  }
   if (k == `AC`) {
     reset();
-
   }
   if (fixk.includes(k)) {
-    k = kto[fixk.indexOf(k)]
+    k = kto[fixk.indexOf(k)];
   }
   if (allkeys.includes(k)) {
     eq = eq + k;
@@ -122,9 +124,8 @@ function inputkeys(k) {
     eqprep(eq);
     runEquation(eqr);
     eqr = [];
-    ARR = [];
     arrn = [];
-    eq = '';
+    eq = "";
   }
   qs(`.eq`).textContent = eq;
 }
@@ -132,13 +133,15 @@ function inputkeys(k) {
 function eqprep(str) {
   let opsregex = /([-+*^/()])/;
   eqr = eq.split(opsregex);
-  let notempty = (e) => { return e != `` }
+  let notempty = (e) => {
+    return e != ``;
+  };
   eqr = eqr.filter(notempty);
   return eqr;
 }
 
 function reset() {
-  eq = '';
+  eq = "";
   qs(`.ans`).textContent = ``;
   eqr = [];
   ARR = [];
@@ -147,11 +150,41 @@ function reset() {
 
 // --- math ---
 const operations = [
-  { symb: `^`, math: function exp(x, y) { return x ** y }, order: 1, },
-  { symb: `/`, math: function divide(x, y) { return x / y }, order: 2, },
-  { symb: `*`, math: function times(x, y) { return x * y }, order: 3, },
-  { symb: `+`, math: function add(x, y) { return x + y }, order: 4, },
-  { symb: `-`, math: function subtract(x, y) { return x - y }, order: 5, },
+  {
+    symb: `^`,
+    math: function exp(x, y) {
+      return x ** y;
+    },
+    order: 1,
+  },
+  {
+    symb: `/`,
+    math: function divide(x, y) {
+      return x / y;
+    },
+    order: 2,
+  },
+  {
+    symb: `*`,
+    math: function times(x, y) {
+      return x * y;
+    },
+    order: 3,
+  },
+  {
+    symb: `+`,
+    math: function add(x, y) {
+      return x + y;
+    },
+    order: 4,
+  },
+  {
+    symb: `-`,
+    math: function subtract(x, y) {
+      return x - y;
+    },
+    order: 5,
+  },
 ];
 
 /* ---------------------- STACKS ----------------------------
@@ -172,14 +205,21 @@ let block = [];
 let result = new Number();
 let opAns = new Number();
 let orderlevel = 1;
-let ARR = [];
 let arrn = [];
 
 //go
 function runEquation(arr) {
-  ARR = Array.from(arr);
-  ARR.unshift(`(`);
-  ARR.push(")");
+  let ARR = [];
+  arr.forEach((e) => {
+    if (!isNaN(Number(e))) {
+      ARR.push(Number(e));
+    } else {
+      ARR.push(e);
+    }
+  });
+  console.log(ARR);
+  // ARR.unshift(`(`);
+  // ARR.push(")");
   parseEq(ARR);
 }
 
@@ -203,6 +243,10 @@ function parseEq(arr) {
 
 //creates stackPairs[`open/close`, index, stacknum]
 function stack(arr) {
+  if (!arr.includes(`(`, `)`)) {
+    arr.unshift(`(`);
+    arr.push(`)`);
+  }
   let cstack = 0;
   for (let i = 0; i < arr.length; i++) {
     if (arr[i] == `(`) {
@@ -217,7 +261,6 @@ function stack(arr) {
   let h = 0;
   let cl = [];
   let op = [];
-
 
   stacksArr.forEach((e) => {
     if (e[0] == `open`) {
@@ -246,7 +289,6 @@ function stack(arr) {
     }
   }
   stackpair = [x1, x2];
-
 }
 
 //block[] = new array for stack only
@@ -276,13 +318,12 @@ function parseBlock(arr) {
   for (let i = 0; i < str.length; i++) {
     //double operators
     let tc = (x) => testChars.includes(str.charAt(x));
-    if (tc(i) && tc(i - 1) || tc(i) && tc(i + 1)) {
+    if ((tc(i) && tc(i - 1)) || (tc(i) && tc(i + 1))) {
       error = true;
     }
     //brace & operators
     if (str.charAt(i) == `(` && tc(i + 1)) {
       error = true;
-
     }
     if (str.charAt(i) == `)` && tc(str.charAt(i - 1))) {
       error = true;
@@ -340,71 +381,73 @@ function operate(arr, index, x, y, operator, hierarchy) {
   });
 }
 
+//reup times
+
+let last = true;
+let finalans;
+
 function reup(arr, result) {
-  let npairs = stacksArr.length / 2;
-  let openPos = stackpair[0];
-  let closePos = stackpair[1];
-  let blength = stackpair[1] - stackpair[0] - 1;
+  console.log(
+    `arr`,
+    arr,
+    `result`,
+    result,
+    `stackpairs`,
+    stackpair[0],
+    stackpair[1]
+  );
 
+  let start = stackpair[0];
+  let end = stackpair[1];
+  let length = end - start;
 
+  console.log(`len`, length);
 
-  arr.forEach(e => {
-    if (!isNaN(Number(e))) {
-      arrn.push(Number(e));
-    } else {
-      arrn.push(e);
+  //splice result into array
+  arr.splice(start + 1, length - 1, result);
+  end = start + 2;
+
+  console.log(`length arr`, arr, `start`, start, `end`, end);
+
+  let arrstart = arr[start];
+  let outleft = arr[start - 1];
+  let arrend = arr[end];
+  let outright = arr[end + 1];
+
+  // (braces)(together)
+  // do * separately from removal of braces, not at same time
+  // * first then brace removal
+
+  if (arrstart == `(`) {
+    if (outleft == `)` || typeof outleft == `number`) {
+      arr.splice(start, 0, `*`);
+      start = start + 1;
+      end = end + 1;
     }
-  });
-  console.log(result);
-  console.log(arr);
-  console.log(arrn);
-
-  //splice(start, deletecount, replace1,2,3,....)
-  let replaceClose = (replace) => { arrn.splice(closePos, 0, replace) }
-  let removeClose = () => { arrn.splice(closePos, 1) }
-  let replaceOpen = (replace) => { arrn.splice(openPos, 1, replace) }
-  let removeOpen = () => { arrn.splice(openPos, 1) }
-
-  //close
-  switch (typeof arrn[closePos + 1]) {
-    case `number`:
-      replaceClose(`*`);
-      break;
-    case `string`:
-    case `undefined`:
-    case undefined:
-      removeClose();
-    default:
-      break;
-  }
-  //insert result
-
-  arrn.splice(openPos + 1, blength, result);
-
-  //open
-  switch (typeof arrn[openPos - 1]) {
-    case `number`:
-      replaceOpen(`*`);
-      break;
-    case `string`:
-    case `undefined`:
-    case undefined:
-      removeOpen();
-    default:
-      break;
-  }
-  console.log(arrn);
-  console.log(`result`, result);
-  console.log(npairs);
-
-  qs(`.ans`).textContent = result;
-
-  if (npairs > 1) {
-    parseEq(arrn);
   }
 
+  if (arrend == `)`) {
+    if (outright == `(` || typeof outright == `number`) {
+      arr.splice(end + 1, 0, `*`);
+    }
+  }
 
+  arr.splice(end, 1);
+  arr.splice(start, 1);
+
+  //last pass
+  if (!arr.includes(`(`, `)`) && last == true && arr.length > 1) {
+    last = false;
+    runEquation(arr);
+  }
+  //run if more stacks
+  if (arr.includes(`(`, `)`)) {
+    runEquation(arr);
+  }
+  if (arr.length == 1) {
+    console.log(arr);
+    finalans = arr;
+    qs(`.ans`).textContent = finalans;
+    return;
+  }
 }
-
-
-
