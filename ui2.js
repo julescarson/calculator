@@ -121,7 +121,10 @@ function inputkeys(k) {
   if (k == `Enter`) {
     eqprep(eq);
     runEquation(eqr);
-
+    eqr = [];
+    ARR = [];
+    arrn = [];
+    eq = '';
   }
   qs(`.eq`).textContent = eq;
 }
@@ -131,7 +134,6 @@ function eqprep(str) {
   eqr = eq.split(opsregex);
   let notempty = (e) => { return e != `` }
   eqr = eqr.filter(notempty);
-  console.log(eqr);
   return eqr;
 }
 
@@ -139,6 +141,8 @@ function reset() {
   eq = '';
   qs(`.ans`).textContent = ``;
   eqr = [];
+  ARR = [];
+  arrn = [];
 }
 
 // --- math ---
@@ -169,13 +173,13 @@ let result = new Number();
 let opAns = new Number();
 let orderlevel = 1;
 let ARR = [];
+let arrn = [];
 
 //go
-function runEquation() {
-  ARR = Array.from(eqr);
+function runEquation(arr) {
+  ARR = Array.from(arr);
   ARR.unshift(`(`);
   ARR.push(")");
-  console.log(ARR);
   parseEq(ARR);
 }
 
@@ -191,6 +195,7 @@ function clearVars() {
 }
 
 function parseEq(arr) {
+  clearVars();
   stack(arr);
   prepareStack(arr, stackpair);
   reup(arr, result);
@@ -212,7 +217,7 @@ function stack(arr) {
   let h = 0;
   let cl = [];
   let op = [];
-  let costack = [];
+
 
   stacksArr.forEach((e) => {
     if (e[0] == `open`) {
@@ -241,6 +246,7 @@ function stack(arr) {
     }
   }
   stackpair = [x1, x2];
+
 }
 
 //block[] = new array for stack only
@@ -269,23 +275,17 @@ function parseBlock(arr) {
 
   for (let i = 0; i < str.length; i++) {
     //double operators
-    if (
-      (testChars.includes(str.charAt(i)) &&
-        testChars.includes(str.charAt(i - 1))) ||
-      (testChars.includes(str.charAt(i)) &&
-        testChars.includes(str.charAt(i + 1)))
-    ) {
+    let tc = (x) => testChars.includes(str.charAt(x));
+    if (tc(i) && tc(i - 1) || tc(i) && tc(i + 1)) {
       error = true;
-      return error;
     }
     //brace & operators
-    if (str.charAt(i) == `(` && testChars.includes(str.charAt(i + 1))) {
+    if (str.charAt(i) == `(` && tc(i + 1)) {
       error = true;
-      return error;
+
     }
-    if (str.charAt(i) == `)` && testChars.includes(str.charAt(i - 1))) {
+    if (str.charAt(i) == `)` && tc(str.charAt(i - 1))) {
       error = true;
-      return error;
     }
     if (str.charAt(i) == `)`) {
       rbrace++;
@@ -298,13 +298,10 @@ function parseBlock(arr) {
   //empty braces, uneven brace number
   if (str.includes(`()`) || rbrace != lbrace) {
     error = true;
-    return error;
   }
 
   //equation passed/failed valid check
-  if (error === false) {
-    console.log(`runs`, arr);
-
+  if (error == false) {
     order(arr);
   } else {
     return 0;
@@ -349,24 +346,27 @@ function reup(arr, result) {
   let closePos = stackpair[1];
   let blength = stackpair[1] - stackpair[0] - 1;
 
-  console.log(arr, npairs);
 
-  // //splice(start, deletecount, replace1,2,3,....)
-  let replaceClose = (replace) => {
-    arr.splice(closePos, 1, replace);
-  };
-  let removeClose = () => {
-    arr.splice(closePos, 1);
-  };
-  let replaceOpen = (replace) => {
-    arr.splice(openPos, 1, replace);
-  };
-  let removeOpen = () => {
-    arr.splice(openPos, 1);
-  };
+
+  arr.forEach(e => {
+    if (!isNaN(Number(e))) {
+      arrn.push(Number(e));
+    } else {
+      arrn.push(e);
+    }
+  });
+  console.log(result);
+  console.log(arr);
+  console.log(arrn);
+
+  //splice(start, deletecount, replace1,2,3,....)
+  let replaceClose = (replace) => { arrn.splice(closePos, 0, replace) }
+  let removeClose = () => { arrn.splice(closePos, 1) }
+  let replaceOpen = (replace) => { arrn.splice(openPos, 1, replace) }
+  let removeOpen = () => { arrn.splice(openPos, 1) }
 
   //close
-  switch (typeof arr[closePos + 1]) {
+  switch (typeof arrn[closePos + 1]) {
     case `number`:
       replaceClose(`*`);
       break;
@@ -378,11 +378,11 @@ function reup(arr, result) {
       break;
   }
   //insert result
-  arr.splice(openPos + 1, blength, result);
-  console.log(arr);
+
+  arrn.splice(openPos + 1, blength, result);
 
   //open
-  switch (typeof arr[openPos - 1]) {
+  switch (typeof arrn[openPos - 1]) {
     case `number`:
       replaceOpen(`*`);
       break;
@@ -393,16 +393,17 @@ function reup(arr, result) {
     default:
       break;
   }
+  console.log(arrn);
+  console.log(`result`, result);
+  console.log(npairs);
 
-  console.log(arr);
-  clearVars();
+  qs(`.ans`).textContent = result;
 
   if (npairs > 1) {
-    parseEq(arr);
+    parseEq(arrn);
   }
-  result = arr[0];
-  console.log(result);
-  qs(`.ans`).textContent = result;
+
+
 }
 
 
