@@ -1,5 +1,5 @@
 
-//DOM
+//-- DOM --
 const content = document.querySelector(`.content`);
 
 const layout = [
@@ -52,6 +52,7 @@ function crdom(name, parent, cn, text) {
   newdiv.textContent = text;
 }
 
+//create divs based on layout
 layout.forEach((e) => crdom(e.section, e.parent, null, null));
 ckeybar.forEach((k) => crdom(k, `fnbar`, `fkey`, k));
 ckeys.forEach((k) => crdom(k, `numkeycont`, `btn`, k));
@@ -75,6 +76,7 @@ let rntime = () => (qs(`.time`).textContent = `${rn()} `);
 rntime();
 updateTime();
 
+//update every minute
 function updateTime() {
   setInterval(function () {
     rntime();
@@ -82,26 +84,43 @@ function updateTime() {
   }, 60000);
 }
 
-// -- input --
+//user input
 let eq = ``;
 let allkeys = Array.from(ckeys);
 allkeys.push(`^`, `/`, `*`, `(`, `)`);
 let eqr = [];
 
-
 document.addEventListener("keydown", (e) => {
-  if (allkeys.includes(e.key)) {
-    eq = eq + e.key;
+  inputkeys(e.key);
+});
+
+qs(`.inputcont`).addEventListener(`click`, function (e) {
+  inputkeys(e.target.textContent);
+})
+
+function inputkeys(k) {
+  let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
+  let kto = [`Delete`, ``, `Enter`, `/`, `*`];
+  console.log(k);
+
+  if (k == `AC`) {
+    eq = ``;
   }
-  if (e.key == `Delete` || e.key == `Backspace`) {
+  if (fixk.includes(k)) {
+    k = kto[fixk.indexOf(k)]
+  }
+  if (allkeys.includes(k)) {
+    eq = eq + k;
+  }
+  if (k == `Delete` || k == `Backspace`) {
     eq = eq.slice(0, eq.length - 1);
   }
-  if (e.key == `Enter`) {
+  if (k == `Enter`) {
     eqprep(eq)
     console.log(eqr);
   }
   qs(`.eq`).textContent = eq;
-});
+}
 
 function eqprep(str) {
   let opsregex = /([-+*^/()])/;
@@ -110,5 +129,4 @@ function eqprep(str) {
   eqr = eqr.filter(notempty);
 }
 
-console.log(eqr);
-export { eqr };
+//math
