@@ -1,45 +1,10 @@
 //bedmas
-operations = [
-  {
-    name: "exp",
-    math: function exp(x, y) {
-      return x ** y;
-    },
-    symb: `^`,
-    order: 1,
-  },
-  {
-    name: `division`,
-    math: function divide(x, y) {
-      return x / y;
-    },
-    symb: `/`,
-    order: 2,
-  },
-  {
-    name: `multiplication`,
-    math: function times(x, y) {
-      return x * y;
-    },
-    symb: `*`,
-    order: 3,
-  },
-  {
-    name: `addition`,
-    math: function add(x, y) {
-      return x + y;
-    },
-    symb: `+`,
-    order: 4,
-  },
-  {
-    name: `subtraction`,
-    math: function subtract(x, y) {
-      return x - y;
-    },
-    symb: `-`,
-    order: 5,
-  },
+const operations = [
+  { symb: `^`, math: function exp(x, y) { return x ** y }, order: 1, },
+  { symb: `/`, math: function divide(x, y) { return x / y }, order: 2, },
+  { symb: `*`, math: function times(x, y) { return x * y }, order: 3, },
+  { symb: `+`, math: function add(x, y) { return x + y }, order: 4, },
+  { symb: `-`, math: function subtract(x, y) { return x - y }, order: 5, },
 ];
 
 /* ---------------------- STACKS ----------------------------
@@ -52,26 +17,24 @@ operations = [
 6. return a Number
 ------------------------------------------------------------*/
 
-//eq array examples
-let arr1 = [`(`, 55, `+`, 45, `-`, 85, `-`, 12, `*`, 6, `)`];
-
 //itialize vars
 let stacksArr = []; // [`open/close, index (original pos in equation), stack number]
 let stackpair = [];
 let blockLength = 0;
+let block = [];
 let result = new Number();
 let opAns = new Number();
 let orderlevel = 1;
 
-//prep array
-let ARR = Array.from(arr1);
-ARR.unshift(`(`);
-ARR.push(")");
-
-console.log(ARR);
-
-//attempt
-parseEq(ARR);
+//go
+function runEquation() {
+  console.log(e.key, eqr);
+  let ARR = Array.from(eqr);
+  ARR.unshift(`(`);
+  ARR.push(")");
+  console.log(ARR);
+  parseEq(ARR);
+}
 
 //reset
 function clearVars() {
@@ -88,13 +51,13 @@ function clearVars() {
 function parseEq(arr) {
   stack(arr);
   prepareStack(arr, stackpair);
-  reup(ARR, result);
+  reup(arr, result);
 }
 
 //creates stackPairs[`open/close`, index, stacknum]
 function stack(arr) {
   let cstack = 0;
-  for (i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (arr[i] == `(`) {
       cstack++;
       stacksArr.push([`open`, i, cstack]);
@@ -130,7 +93,7 @@ function stack(arr) {
   let x2 = Math.min(...cl);
   let x1 = 0;
 
-  for (i = 0; i < op.length; i++) {
+  for (let i = 0; i < op.length; i++) {
     if (op[i] > x1 && op[i] < x2) {
       x1 = op[i];
     }
@@ -140,12 +103,12 @@ function stack(arr) {
 
 //block[] = new array for stack only
 function prepareStack(arr, currentpair) {
-  let block = [];
+  block = [];
   currentpair = stackpair;
   blockLength = 0;
 
   // [o,c] indices, find length between for original arr
-  for (i = currentpair[0]; i < currentpair[1] - 1; i++) {
+  for (let i = currentpair[0]; i < currentpair[1] - 1; i++) {
     block.push(arr[i + 1]);
     blockLength++;
   }
@@ -162,7 +125,7 @@ function parseBlock(arr) {
   let rbrace = 0;
   let lbrace = 0;
 
-  for (i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i++) {
     //double operators
     if (
       (testChars.includes(str.charAt(i)) &&
@@ -210,7 +173,7 @@ function parseBlock(arr) {
 function order(arr) {
   let osymb = operations[orderlevel - 1].symb;
 
-  for (i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     let value1 = Number([arr[i - 1]]);
     let value2 = Number([arr[i + 1]]);
     let op = arr[i];
@@ -298,3 +261,4 @@ function reup(arr, result) {
   result = arr[0];
   console.log(result);
 }
+

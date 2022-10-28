@@ -1,39 +1,11 @@
-
 //bedmas
-operations = [
-    {
-        name: "exp",
-        math: function exp(x, y) { return x ** y; },
-        symb: `^`,
-        order: 1,
-    },
-    {
-        name: `division`,
-        math: function divide(x, y) { return x / y; },
-        symb: `/`,
-        order: 2,
-    },
-    {
-        name: `multiplication`,
-        math: function times(x, y) { return x * y; },
-        symb: `*`,
-        order: 3,
-    },
-    {
-        name: `addition`,
-        math: function add(x, y) { return x + y; },
-        symb: `+`,
-        order: 4,
-    },
-    {
-        name: `subtraction`,
-        math: function subtract(x, y) { return x - y; },
-        symb: `-`,
-        order: 5,
-    },
-
+const operations = [
+    { symb: `^`, math: function exp(x, y) { return x ** y }, order: 1, },
+    { symb: `/`, math: function divide(x, y) { return x / y }, order: 2, },
+    { symb: `*`, math: function times(x, y) { return x * y }, order: 3, },
+    { symb: `+`, math: function add(x, y) { return x + y }, order: 4, },
+    { symb: `-`, math: function subtract(x, y) { return x - y }, order: 5, },
 ];
-
 
 //test
 const test = true;
@@ -51,7 +23,7 @@ let badarr2 = [55, `(`, `)`, 5];
 let badarr3 = [55, `(`, `-`, 5];
 
 //equation array -> new array that we modify
-let ARR = Array.from(arr4); // <---
+let ARR = Array.from(badarr1); // <---
 
 //vars
 let _result = new Number;
@@ -83,16 +55,19 @@ function parseEq(arr) {
         if ((testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i - 1))) ||
             (testChars.includes(str.charAt(i)) && testChars.includes(str.charAt(i + 1)))) {
             error = true;
-            return error;
+            console.log(`double operators`);
+
         }
         //brace & operators
         if (str.charAt(i) == `(` && testChars.includes(str.charAt(i + 1))) {
             error = true;
-            return error;
+            console.log(`brace ops`);
+
         }
         if (str.charAt(i) == `)` && testChars.includes(str.charAt(i - 1))) {
             error = true;
-            return error;
+            console.log(`brace ops`);
+
         }
         if (str.charAt(i) == `)`) { rbrace++; }
         if (str.charAt(i) == `(`) { lbrace++; }
@@ -102,13 +77,11 @@ function parseEq(arr) {
     //empty braces, uneven brace number
     if (str.includes(`()`) || rbrace != lbrace) {
         error = true;
-        return error;
     }
-
-
     if (error === false) {
         order(ARR);
     }
+
 }
 
 //operator hierarchy
