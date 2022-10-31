@@ -143,7 +143,7 @@ function inputkeys(k) {
 }
 
 function eqprep(str) {
-  let opsregex = /([-+*^/()])/;
+  let opsregex = /([-e+*^/()])/;
   eqr = eq.split(opsregex);
   let notempty = (e) => {
     return e != ``;
@@ -195,28 +195,6 @@ const synerror = (er) => qs(`.ans`).textContent = `idk lol ${er}?`;
 //go
 function runEquation(arr) {
   let ARR = [];
-
-
-  for (let i = 0; i < arr.length; i++) {
-    //double negative
-    if (arr[i] == `-` && arr[i - 1] == `-`) {
-      arr.splice(i - 1, 2, `+`);
-    }
-    //adding a negative
-    if (arr[i] == `-` && arr[i - 1] == `+`) {
-      arr.splice(i - 1, 2, `-`);
-    }
-  }
-  //don't start or end on symbols
-  let notsymb = [`*`, `^`, `/`, `+`, `.`];
-  console.log(arr[arr.length - 1]);
-  if (notsymb.includes(arr[arr.length - 1]) || notsymb.includes(arr[0])) {
-    synerror(`uhhh`);
-    return;
-  }
-
-
-
   //make everything numbers that can be
   arr.forEach((e) => {
     if (!isNaN(Number(e))) {
@@ -225,6 +203,61 @@ function runEquation(arr) {
       ARR.push(e);
     }
   });
+
+
+  for (let i = 0; i < ARR.length; i++) {
+    //double negative
+    if (ARR[i] == `-` && ARR[i - 1] == `-`) {
+      ARR.splice(i - 1, 2, `+`);
+    }
+    //adding a negative
+    if (ARR[i] == `-` && ARR[i - 1] == `+`) {
+      ARR.splice(i - 1, 2, `-`);
+    }
+    //no empty braces
+    if (ARR[i] == ')' && ARR[i - 1] == `(`) {
+      console.log(`empty`);
+      synerror(`empty ()`);
+      return;
+    }
+
+    //e, pi, 
+    function epie() {
+
+    }
+
+    //e and *    
+    if (ARR[i] == `e`) {
+      ARR.splice(i, 1, Math.E);
+      console.log(typeof ARR[i - 1])
+
+      if (typeof ARR[i - 1] == `number` || ARR[i - 1] == `)`) {
+        console.log(`isnum`)
+        ARR.splice(i, 0, `*`);
+      }
+      if (typeof ARR[i + 1] == `number` || ARR[i + 1] == `(`) {
+        ARR.splice(i + 1, 0, `*`);
+      }
+    }
+
+
+
+
+    console.log(ARR);
+    //pi
+    if (ARR[i] == `π`) {
+      ARR.splice(i, 1, Math.PI);
+    }
+  }
+  //don't start or end on symbols
+  let notsymb = [`*`, `^`, `/`, `+`, `.`];
+
+  if (notsymb.includes(ARR[ARR.length - 1]) || notsymb.includes(ARR[0])) {
+    synerror(`syntax`);
+    return;
+  }
+
+
 
   //first number negative
   if (ARR[0] == `-` && typeof ARR[1] == `number`) {
@@ -246,7 +279,6 @@ function parseEq(arr) {
   // pass to parseblock -> pass to order -> result = var completed math ops for block
   reup(arr, result);
 }
-
 
 //reset
 function clearVars() {
@@ -399,7 +431,6 @@ function operate(arr, index, x, y, operator, hierarchy) {
 //reup times
 let last = true;
 let finalans;
-
 function reup(arr, result) {
   console.log(
     `arr`,
@@ -439,17 +470,13 @@ function reup(arr, result) {
       end = end + 1;
     }
   }
-
   if (arrend == `)`) {
     if (outright == `(` || typeof outright == `number`) {
       arr.splice(end + 1, 0, `*`);
     }
   }
-
   arr.splice(end, 1);
   arr.splice(start, 1);
-
-
   console.log(arr);
   let err = false;
 
@@ -482,9 +509,6 @@ function reup(arr, result) {
     return;
   }
 
-
-
-
   if (arr[0] == `(` && arr[arr.length - 1] == `)`) {
     if (arr.length == 3) {
       qs(`.ans`).textContent = arr[1];
@@ -500,10 +524,6 @@ function reup(arr, result) {
       runEquation(arr);
     }
   } else if (err == false) {
-    qs(`.ans`).textContent = arr;
+    qs(`.ans`).textContent = arr[0];
   }
-
-
-
-
 }
