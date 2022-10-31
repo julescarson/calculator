@@ -101,10 +101,17 @@ qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
 });
 
+
 function inputkeys(k) {
   let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
   let kto = [`Delete`, ``, `Enter`, `/`, `*`];
 
+  if (k == `e` || k == `π`) {
+    eq = eq + k;
+  }
+  if (k == `xy`) {
+    eq = eq + `^`;
+  }
   if (qs(`.ans`).textContent != ``) {
     reset();
   }
@@ -150,41 +157,11 @@ function reset() {
 
 // --- math ---
 const operations = [
-  {
-    symb: `^`,
-    math: function exp(x, y) {
-      return x ** y;
-    },
-    order: 1,
-  },
-  {
-    symb: `/`,
-    math: function divide(x, y) {
-      return x / y;
-    },
-    order: 2,
-  },
-  {
-    symb: `*`,
-    math: function times(x, y) {
-      return x * y;
-    },
-    order: 3,
-  },
-  {
-    symb: `+`,
-    math: function add(x, y) {
-      return x + y;
-    },
-    order: 4,
-  },
-  {
-    symb: `-`,
-    math: function subtract(x, y) {
-      return x - y;
-    },
-    order: 5,
-  },
+  { symb: `^`, math: function exp(x, y) { return x ** y; }, order: 1, },
+  { symb: `/`, math: function divide(x, y) { return x / y; }, order: 2, },
+  { symb: `*`, math: function times(x, y) { return x * y; }, order: 3, },
+  { symb: `+`, math: function add(x, y) { return x + y; }, order: 4, },
+  { symb: `-`, math: function subtract(x, y) { return x - y; }, order: 5, },
 ];
 
 /* ---------------------- STACKS ----------------------------
@@ -210,6 +187,9 @@ let arrn = [];
 //go
 function runEquation(arr) {
   let ARR = [];
+
+
+  //make everything numbers that can be
   arr.forEach((e) => {
     if (!isNaN(Number(e))) {
       ARR.push(Number(e));
@@ -217,11 +197,23 @@ function runEquation(arr) {
       ARR.push(e);
     }
   });
-  console.log(ARR);
-  // ARR.unshift(`(`);
-  // ARR.push(")");
+
+  //add brackets on outer edges of array for lowest stack
+  console.log(`before brackets`, ARR);
+  ARR.unshift(`(`);
+  ARR.push(")");
+  console.log(`after brackets`, ARR);
   parseEq(ARR);
 }
+
+function parseEq(arr) {
+  clearVars();
+  stack(arr); //sets up stacks
+  prepareStack(arr, stackpair); // current stack only array 
+  // pass to parseblock -> pass to order -> result = var completed math ops for block
+  reup(arr, result);
+}
+
 
 //reset
 function clearVars() {
@@ -234,19 +226,9 @@ function clearVars() {
   orderlevel = 1;
 }
 
-function parseEq(arr) {
-  clearVars();
-  stack(arr);
-  prepareStack(arr, stackpair);
-  reup(arr, result);
-}
-
-//creates stackPairs[`open/close`, index, stacknum]
+// stacksArr[`open or close`, index, stacknum]
+// stackpair matching [open, close] for current level
 function stack(arr) {
-  if (!arr.includes(`(`, `)`)) {
-    arr.unshift(`(`);
-    arr.push(`)`);
-  }
   let cstack = 0;
   for (let i = 0; i < arr.length; i++) {
     if (arr[i] == `(`) {
@@ -382,7 +364,6 @@ function operate(arr, index, x, y, operator, hierarchy) {
 }
 
 //reup times
-
 let last = true;
 let finalans;
 
@@ -407,7 +388,7 @@ function reup(arr, result) {
   arr.splice(start + 1, length - 1, result);
   end = start + 2;
 
-  console.log(`length arr`, arr, `start`, start, `end`, end);
+  console.log(`length arr`, arr.length, `start`, start, `end`, end);
 
   let arrstart = arr[start];
   let outleft = arr[start - 1];
@@ -435,19 +416,64 @@ function reup(arr, result) {
   arr.splice(end, 1);
   arr.splice(start, 1);
 
-  //last pass
-  if (!arr.includes(`(`, `)`) && last == true && arr.length > 1) {
-    last = false;
-    runEquation(arr);
-  }
   //run if more stacks
-  if (arr.includes(`(`, `)`)) {
-    runEquation(arr);
-  }
-  if (arr.length == 1) {
-    console.log(arr);
-    finalans = arr;
-    qs(`.ans`).textContent = finalans;
+  // RERUN LOGIC FIX CONDITION  
+  console.log(arr);
+  let err = false;
+  const synerror = (er) => qs(`.ans`).textContent = `idk lol ${er}?`;
+
+
+  let c = 0;
+  let o = 0;
+
+  arr.forEach(e => {
+    if (e == `)`) { c++; }
+    else if (e == `(`) { o++; }
+
+
+    let dec = 0;
+    for (i in e) {
+      if (e[i] == `.`) {
+        dec++;
+      }
+    }
+    console.log(dec);
+    if (dec > 1) {
+      err = true;
+      synerror(`decimals`);
+      return;
+    }
+  });
+
+  if (c != o) {
+    console.log(`uneven braces`);
+    synerror(`brackets`);
+    err = true;
     return;
   }
+
+
+
+
+  if (arr[0] == `(` && arr[arr.length - 1] == `)`) {
+    if (arr.length == 3) {
+      qs(`.ans`).textContent = arr[1];
+    }
+    else if (arr.length == 1) {
+      qs(`.ans`).textContent = arr[0];
+      return;
+    } else {
+      console.log(`shfit popp`, arr);
+      arr.shift();
+      arr.pop();
+      console.log(`shfit popp`, arr);
+      runEquation(arr);
+    }
+  } else if (err == false) {
+    qs(`.ans`).textContent = arr;
+  }
+
+
+
+
 }
