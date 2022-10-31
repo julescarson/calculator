@@ -24,6 +24,8 @@ body {
     padding: 0px;
 }
 
+.tilt {}
+
 .device {
     display: block;
     box-sizing: border-box;
@@ -105,7 +107,7 @@ img {
     font-size: 1em;
 }
 
-.fkeys {
+.fkey {
     display: flex;
     justify-content: center;
     margin-top: 0.5em;
@@ -115,7 +117,7 @@ img {
     /* transition-duration: 0.1s; */
 }
 
-.fkeys:hover {
+.fkey:hover {
     cursor: pointer;
     position: relative;
     color: cyan;
@@ -123,8 +125,7 @@ img {
     border-radius: 15%;
 }
 
-/* ? */
-.fkeys:last-child:hover {
+.fkey:last-child:hover {
     box-shadow: 0 0 0 50em #b8d6f2;
     border: 1px solid hotpink;
     color: hotpink;
@@ -152,7 +153,7 @@ img {
     border-radius: 100%;
     border: 1px solid rgba(47, 79, 79, 0.01);
     color: darkslategray;
-    /* transition-duration: 0.1s; */
+    transition-duration: 0.1s;
 }
 
 .btn:hover {
