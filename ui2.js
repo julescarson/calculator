@@ -128,7 +128,12 @@ function inputkeys(k) {
     eq = eq.slice(0, eq.length - 1);
   }
   if (k == `Enter`) {
+
     eqprep(eq);
+
+
+
+
     runEquation(eqr);
     eqr = [];
     arrn = [];
@@ -184,9 +189,32 @@ let opAns = new Number();
 let orderlevel = 1;
 let arrn = [];
 
+
+const synerror = (er) => qs(`.ans`).textContent = `idk lol ${er}?`;
+
 //go
 function runEquation(arr) {
   let ARR = [];
+
+
+  for (let i = 0; i < arr.length; i++) {
+    //double negative
+    if (arr[i] == `-` && arr[i - 1] == `-`) {
+      arr.splice(i - 1, 2, `+`);
+    }
+    //adding a negative
+    if (arr[i] == `-` && arr[i - 1] == `+`) {
+      arr.splice(i - 1, 2, `-`);
+    }
+  }
+  //don't start or end on symbols
+  let notsymb = [`*`, `^`, `/`, `+`, `.`];
+  console.log(arr[arr.length - 1]);
+  if (notsymb.includes(arr[arr.length - 1]) || notsymb.includes(arr[0])) {
+    synerror(`uhhh`);
+    return;
+  }
+
 
 
   //make everything numbers that can be
@@ -198,11 +226,16 @@ function runEquation(arr) {
     }
   });
 
-  //add brackets on outer edges of array for lowest stack
-  console.log(`before brackets`, ARR);
+  //first number negative
+  if (ARR[0] == `-` && typeof ARR[1] == `number`) {
+    ARR[1] = ARR[1] * -1;
+    ARR.shift();
+  }
+
+  //add brackets outer brackets
   ARR.unshift(`(`);
   ARR.push(")");
-  console.log(`after brackets`, ARR);
+
   parseEq(ARR);
 }
 
@@ -416,12 +449,9 @@ function reup(arr, result) {
   arr.splice(end, 1);
   arr.splice(start, 1);
 
-  //run if more stacks
-  // RERUN LOGIC FIX CONDITION  
+
   console.log(arr);
   let err = false;
-  const synerror = (er) => qs(`.ans`).textContent = `idk lol ${er}?`;
-
 
   let c = 0;
   let o = 0;
