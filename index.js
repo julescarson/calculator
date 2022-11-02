@@ -101,7 +101,6 @@ qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
 });
 
-
 function inputkeys(k) {
   let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
   let kto = [`Delete`, ``, `Enter`, `/`, `*`];
@@ -128,16 +127,17 @@ function inputkeys(k) {
     eq = eq.slice(0, eq.length - 1);
   }
   if (k == `Enter`) {
-
     eqprep(eq);
-
-
-
-
     runEquation(eqr);
     eqr = [];
     arrn = [];
     eq = "";
+  }
+  //sqrt
+  if (k == `√x`) {
+    eq = `(${eq})^0.5`;
+    eqprep(eq);
+    runEquation(eqr);
   }
   qs(`.eq`).textContent = eq;
 }
@@ -162,11 +162,41 @@ function reset() {
 
 // --- math ---
 const operations = [
-  { symb: `^`, math: function exp(x, y) { return x ** y; }, order: 1, },
-  { symb: `/`, math: function divide(x, y) { return x / y; }, order: 2, },
-  { symb: `*`, math: function times(x, y) { return x * y; }, order: 3, },
-  { symb: `+`, math: function add(x, y) { return x + y; }, order: 4, },
-  { symb: `-`, math: function subtract(x, y) { return x - y; }, order: 5, },
+  {
+    symb: `^`,
+    math: function exp(x, y) {
+      return x ** y;
+    },
+    order: 1,
+  },
+  {
+    symb: `/`,
+    math: function divide(x, y) {
+      return x / y;
+    },
+    order: 2,
+  },
+  {
+    symb: `*`,
+    math: function times(x, y) {
+      return x * y;
+    },
+    order: 3,
+  },
+  {
+    symb: `+`,
+    math: function add(x, y) {
+      return x + y;
+    },
+    order: 4,
+  },
+  {
+    symb: `-`,
+    math: function subtract(x, y) {
+      return x - y;
+    },
+    order: 5,
+  },
 ];
 
 /* ---------------------- STACKS ----------------------------
@@ -189,8 +219,7 @@ let opAns = new Number();
 let orderlevel = 1;
 let arrn = [];
 
-
-const synerror = (er) => qs(`.ans`).textContent = `idk lol ${er}?`;
+const synerror = (er) => (qs(`.ans`).textContent = `idk lol ${er}?`);
 
 //go
 function runEquation(arr) {
@@ -204,7 +233,6 @@ function runEquation(arr) {
     }
   });
 
-
   for (let i = 0; i < ARR.length; i++) {
     //double negative
     if (ARR[i] == `-` && ARR[i - 1] == `-`) {
@@ -215,33 +243,28 @@ function runEquation(arr) {
       ARR.splice(i - 1, 2, `-`);
     }
     //no empty braces
-    if (ARR[i] == ')' && ARR[i - 1] == `(`) {
+    if (ARR[i] == ")" && ARR[i - 1] == `(`) {
       console.log(`empty`);
       synerror(`empty ()`);
       return;
     }
 
-    //e, pi, 
-    function epie() {
+    //e, pi,
+    function epie() {}
 
-    }
-
-    //e and *    
+    //e and *
     if (ARR[i] == `e`) {
       ARR.splice(i, 1, Math.E);
-      console.log(typeof ARR[i - 1])
+      console.log(typeof ARR[i - 1]);
 
       if (typeof ARR[i - 1] == `number` || ARR[i - 1] == `)`) {
-        console.log(`isnum`)
+        console.log(`isnum`);
         ARR.splice(i, 0, `*`);
       }
       if (typeof ARR[i + 1] == `number` || ARR[i + 1] == `(`) {
         ARR.splice(i + 1, 0, `*`);
       }
     }
-
-
-
 
     console.log(ARR);
     //pi
@@ -256,8 +279,6 @@ function runEquation(arr) {
     synerror(`syntax`);
     return;
   }
-
-
 
   //first number negative
   if (ARR[0] == `-` && typeof ARR[1] == `number`) {
@@ -275,7 +296,7 @@ function runEquation(arr) {
 function parseEq(arr) {
   clearVars();
   stack(arr); //sets up stacks
-  prepareStack(arr, stackpair); // current stack only array 
+  prepareStack(arr, stackpair); // current stack only array
   // pass to parseblock -> pass to order -> result = var completed math ops for block
   reup(arr, result);
 }
@@ -483,10 +504,12 @@ function reup(arr, result) {
   let c = 0;
   let o = 0;
 
-  arr.forEach(e => {
-    if (e == `)`) { c++; }
-    else if (e == `(`) { o++; }
-
+  arr.forEach((e) => {
+    if (e == `)`) {
+      c++;
+    } else if (e == `(`) {
+      o++;
+    }
 
     let dec = 0;
     for (i in e) {
@@ -511,10 +534,9 @@ function reup(arr, result) {
 
   if (arr[0] == `(` && arr[arr.length - 1] == `)`) {
     if (arr.length == 3) {
-      qs(`.ans`).textContent = arr[1];
-    }
-    else if (arr.length == 1) {
-      qs(`.ans`).textContent = arr[0];
+      qs(`.ans`).textContent = ndecimal(arr[1]);
+    } else if (arr.length == 1) {
+      qs(`.ans`).textContent = ndecimal(arr[0]);
       return;
     } else {
       console.log(`shfit popp`, arr);
@@ -524,6 +546,26 @@ function reup(arr, result) {
       runEquation(arr);
     }
   } else if (err == false) {
-    qs(`.ans`).textContent = arr[0];
+    ndecimal(arr[0]);
+    qs(`.ans`).textContent = ndecimal(arr[0]);
+  }
+}
+
+//round decimals (max of 4)
+function ndecimal(x) {
+  if (Number.isInteger(x)) {
+    console.log(`integer`, x);
+    return x;
+  } else {
+    let newx = x.toString().split(`.`);
+    let remainder = ``;
+    if (newx[1].length > 4) {
+      for (let i = 0; i < 4; i++) {
+        remainder = remainder + newx[1][i];
+      }
+      return `${newx[0]}.${remainder}`;
+    } else {
+      return x;
+    }
   }
 }
