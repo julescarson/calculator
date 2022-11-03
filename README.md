@@ -2,22 +2,12 @@
 
 To do..
 
-to disallow:
-(+ keypress
+? overlay ??
+ANS preview on = hover \*\*
+syntax error text / text size
+tilt/perspective
+shimmer?
+highlight keys on numpad/key num use
 
-can't start on )
-
-
-/-- , *--, +--, 
-op- allow
-lastkey/opindex 2 prev?
-
-decimal into op -> change to 0 or disallow
-begin with decimal -> change to 0 or disallow
-
-
-alter functionality:
-)( : multiply
--- : assign positive, unless begins with -> remove entirely
-
-
+edge cases:
+)(

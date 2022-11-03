@@ -143,7 +143,7 @@ function inputkeys(k) {
 }
 
 function eqprep(str) {
-  let opsregex = /([-e+*^/()])/;
+  let opsregex = /([-e+*^/()π])/;
   eqr = eq.split(opsregex);
   let notempty = (e) => {
     return e != ``;
@@ -219,7 +219,7 @@ let opAns = new Number();
 let orderlevel = 1;
 let arrn = [];
 
-const synerror = (er) => (qs(`.ans`).textContent = `idk lol ${er}?`);
+const synerror = (er) => (qs(`.ans`).textContent = `syntax error: ${er}`);
 
 //go
 function runEquation(arr) {
@@ -250,33 +250,22 @@ function runEquation(arr) {
     }
 
     //e, pi,
-    function epie() {}
-
-    //e and *
-    if (ARR[i] == `e`) {
-      ARR.splice(i, 1, Math.E);
-      console.log(typeof ARR[i - 1]);
-
-      if (typeof ARR[i - 1] == `number` || ARR[i - 1] == `)`) {
-        console.log(`isnum`);
-        ARR.splice(i, 0, `*`);
+    let epie = (epi, mth) => {
+      if (ARR[i] == epi) {
+        ARR.splice(i, 1, `(`, mth, `)`);
       }
-      if (typeof ARR[i + 1] == `number` || ARR[i + 1] == `(`) {
-        ARR.splice(i + 1, 0, `*`);
-      }
-    }
-
-    console.log(ARR);
-    //pi
-    if (ARR[i] == `π`) {
-      ARR.splice(i, 1, Math.PI);
-    }
+    };
+    epie(`e`, Math.E);
+    epie(`π`, Math.PI);
   }
   //don't start or end on symbols
   let notsymb = [`*`, `^`, `/`, `+`, `.`];
 
-  if (notsymb.includes(ARR[ARR.length - 1]) || notsymb.includes(ARR[0])) {
-    synerror(`syntax`);
+  if (notsymb.includes(ARR[ARR.length - 1])) {
+    synerror(ARR[ARR.length - 1]);
+    return;
+  } else if (notsymb.includes(ARR[0])) {
+    synerror(ARR[0]);
     return;
   }
 
@@ -357,6 +346,8 @@ function stack(arr) {
     }
   }
   stackpair = [x1, x2];
+  console.log(`stackpair`, stackpair);
+  console.log(`stacksarr`, stacksArr);
 }
 
 //block[] = new array for stack only
@@ -483,7 +474,6 @@ function reup(arr, result) {
   // (braces)(together)
   // do * separately from removal of braces, not at same time
   // * first then brace removal
-
   if (arrstart == `(`) {
     if (outleft == `)` || typeof outleft == `number`) {
       arr.splice(start, 0, `*`);
