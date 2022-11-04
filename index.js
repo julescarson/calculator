@@ -219,11 +219,30 @@ let opAns = new Number();
 let orderlevel = 1;
 let arrn = [];
 
-const synerror = (er) => (qs(`.ans`).textContent = `syntax error: ${er}`);
+const synerror = (er) => {
+  qs(`.ans`).style.fontSize = "1.1rem";
+  qs(`.ans`).textContent = `Syntax Error : ${er}`;
+  qs(`.ans`).style.justifyContent = "center";
+};
+
+const showAns = (answer) => {
+  qs(`.ans`).style.fontSize = "1.5em";
+  qs(`.ans`).textContent = answer;
+  qs(`.ans`).style.justifyContent = "end";
+};
 
 //go
 function runEquation(arr) {
   let ARR = [];
+
+  //syntax error ) before (
+  const close1 = arr.findIndex((e) => e == `)`);
+  const open1 = arr.findIndex((e) => e == `(`);
+  if (open1 > close1) {
+    synerror(`braces`);
+    return;
+  }
+
   //make everything numbers that can be
   arr.forEach((e) => {
     if (!isNaN(Number(e))) {
@@ -244,7 +263,6 @@ function runEquation(arr) {
     }
     //no empty braces
     if (ARR[i] == ")" && ARR[i - 1] == `(`) {
-      console.log(`empty`);
       synerror(`empty ()`);
       return;
     }
@@ -346,8 +364,6 @@ function stack(arr) {
     }
   }
   stackpair = [x1, x2];
-  console.log(`stackpair`, stackpair);
-  console.log(`stacksarr`, stacksArr);
 }
 
 //block[] = new array for stack only
@@ -444,27 +460,15 @@ function operate(arr, index, x, y, operator, hierarchy) {
 let last = true;
 let finalans;
 function reup(arr, result) {
-  console.log(
-    `arr`,
-    arr,
-    `result`,
-    result,
-    `stackpairs`,
-    stackpair[0],
-    stackpair[1]
-  );
+  console.log(`reup`);
 
   let start = stackpair[0];
   let end = stackpair[1];
   let length = end - start;
 
-  console.log(`len`, length);
-
   //splice result into array
   arr.splice(start + 1, length - 1, result);
   end = start + 2;
-
-  console.log(`length arr`, arr.length, `start`, start, `end`, end);
 
   let arrstart = arr[start];
   let outleft = arr[start - 1];
@@ -488,7 +492,6 @@ function reup(arr, result) {
   }
   arr.splice(end, 1);
   arr.splice(start, 1);
-  console.log(arr);
   let err = false;
 
   let c = 0;
@@ -507,7 +510,6 @@ function reup(arr, result) {
         dec++;
       }
     }
-    console.log(dec);
     if (dec > 1) {
       err = true;
       synerror(`decimals`);
@@ -516,7 +518,6 @@ function reup(arr, result) {
   });
 
   if (c != o) {
-    console.log(`uneven braces`);
     synerror(`brackets`);
     err = true;
     return;
@@ -524,27 +525,26 @@ function reup(arr, result) {
 
   if (arr[0] == `(` && arr[arr.length - 1] == `)`) {
     if (arr.length == 3) {
-      qs(`.ans`).textContent = ndecimal(arr[1]);
+      let aa = ndecimal(arr[1]);
+      showAns(aa);
     } else if (arr.length == 1) {
-      qs(`.ans`).textContent = ndecimal(arr[0]);
+      let aa = ndecimal(arr[0]);
+      showAns(aa);
       return;
     } else {
-      console.log(`shfit popp`, arr);
       arr.shift();
       arr.pop();
-      console.log(`shfit popp`, arr);
       runEquation(arr);
     }
   } else if (err == false) {
-    ndecimal(arr[0]);
-    qs(`.ans`).textContent = ndecimal(arr[0]);
+    let aa = ndecimal(arr[0]);
+    showAns(aa);
   }
 }
 
 //round decimals (max of 4)
 function ndecimal(x) {
   if (Number.isInteger(x)) {
-    console.log(`integer`, x);
     return x;
   } else {
     let newx = x.toString().split(`.`);
