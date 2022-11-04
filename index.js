@@ -176,8 +176,11 @@ function inputkeys(k) {
   if (allkeys.includes(k)) {
     eq = eq + k;
   }
-  if (k == `Delete` || k == `Backspace`) {
+  if (k == `Backspace`) {
     eq = eq.slice(0, eq.length - 1);
+  }
+  if (k == `Delete`) {
+    eq = ``;
   }
   if (k == `Enter`) {
     eqprep(eq);
