@@ -43,12 +43,16 @@ const ckeys = [
 
 const qs = (s) => document.querySelector(s);
 
-function crdom(name, parent, cn, text) {
+function crdom(name, parent, cn, text, cn2) {
   let newdiv = document.createElement("div");
   newdiv.classList.add(name);
   if (cn) {
     newdiv.classList.add(cn);
   }
+  if (cn2) {
+    newdiv.classList.add(cn2);
+  }
+
   qs(`.${parent}`).append(newdiv);
   newdiv.textContent = text;
 }
@@ -56,7 +60,7 @@ function crdom(name, parent, cn, text) {
 //create divs based on layout
 layout.forEach((e) => crdom(e.section, e.parent, null, null));
 ckeybar.forEach((k) => crdom(k, `fnbar`, `fkey`, k));
-ckeys.forEach((k) => crdom(k, `numkeycont`, `btn`, k));
+ckeys.forEach((k, index) => crdom(k, `numkeycont`, `btn`, k, `k${index}`));
 qs(`.xy`).innerHTML = `x<sup>y</sup>`;
 qs(`.statusbar`).innerHTML = `<img src="statusicons.png"></img>`;
 
@@ -95,16 +99,65 @@ let ans = qs(`.ans`).textContent;
 
 document.addEventListener("keydown", (e) => {
   inputkeys(e.key);
+  highlightKey(e.key);
 });
+
+let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
+let kto = [`Delete`, ``, `Enter`, `/`, `*`];
+
+//AC0,/3,x7,⌫18
+function highlightKey(k) {
+  console.log(k);
+
+  switch (k) {
+    case `Delete`:
+      k = `AC`;
+      break;
+    case `Backspace`:
+      k = `⌫`;
+      break;
+    case `*`:
+      k = `×`;
+      break;
+    case `/`:
+      k = `÷`;
+      break;
+    case `^`:
+      k = `xy`;
+      break;
+    default:
+      k = k;
+      break;
+  }
+
+  if (ckeys.includes(k) || ckeybar.includes(k)) {
+    if (k == `xy` || k == `e`) {
+      qs(`.${k}`).classList.add(`active`);
+      setTimeout(() => {
+        qs(`.${k}`).classList.remove(`active`);
+      }, 200);
+    } else {
+      let keyindex = ckeys.findIndex((e) => e == k);
+      let thisk = qs(`.k${keyindex}`);
+      thisk.classList.add(`active`);
+      if (k == `=` || k == `AC`) {
+        setTimeout(() => {
+          thisk.classList.remove(`active`);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          thisk.classList.remove(`active`);
+        }, 200);
+      }
+    }
+  }
+}
 
 qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
 });
 
 function inputkeys(k) {
-  let fixk = [`⌫`, `AC`, `=`, `÷`, `×`];
-  let kto = [`Delete`, ``, `Enter`, `/`, `*`];
-
   if (k == `e` || k == `π`) {
     eq = eq + k;
   }
