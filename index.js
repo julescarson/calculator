@@ -2,6 +2,9 @@
 const content = document.querySelector(`.content`);
 
 const layout = [
+  { section: `q`, parent: `content` },
+  { section: `info`, parent: `content` },
+  { section: `overlay`, parent: `content` },
   { section: `device`, parent: `content` },
   { section: `topbar`, parent: `device` },
   { section: `time`, parent: `topbar` },
@@ -17,7 +20,7 @@ const layout = [
   { section: `dashtop`, parent: `display` },
 ];
 
-const ckeybar = [`xy`, `√x`, `e`, `π`, `?`];
+const ckeybar = [`xy`, `√x`, `e`, `π`];
 const ckeys = [
   `AC`,
   `(`,
@@ -62,6 +65,35 @@ ckeybar.forEach((k, index) => crdom(k, `fnbar`, `fkey`, k, `f${index}`));
 ckeys.forEach((k, index) => crdom(k, `numkeycont`, `btn`, k, `k${index}`));
 qs(`.xy`).innerHTML = `x<sup>y</sup>`;
 qs(`.statusbar`).innerHTML = `<img src="statusicons.png"></img>`;
+
+// -- ? button x --
+let isactive = false;
+const showinfo = () => (qs(`.info`).textContent = "test");
+const hideinfo = () => (qs(`.info`).textContent = "");
+qs(`.q`).textContent = "i";
+qs(`.q`).classList.add(`qoff`);
+qs(`.overlay`).style.display = "none";
+
+function overlay(io) {
+  if (io) {
+    qs(`.overlay`).style.display = "none";
+    qs(`.q`).classList.add(`qoff`);
+    qs(`.q`).classList.remove(`qon`);
+    qs(`.device`).style.display = "unset";
+  } else if (!io) {
+    qs(`.overlay`).style.display = "unset";
+    qs(`.q`).classList.add(`qon`);
+    qs(`.q`).classList.remove(`qoff`);
+    qs(`.device`).style.display = "none";
+  }
+  isactive = !isactive;
+}
+
+//on/off
+qs(`.q`).addEventListener(`click`, function (e) {
+  console.log({ isactive });
+  overlay(isactive);
+});
 
 //clock
 let t = () => new Date();
@@ -156,41 +188,7 @@ qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
 });
 
-// -- ? button --
-let overlay = false;
-
-function overc() {
-  qs(`.overclose`).addEventListener(`click`, function () {
-    overlay = !overlay;
-    content.removeChild(qs(`.overdev`));
-    content.removeChild(qs(`.overclose`));
-  });
-}
-
-crdom(`info`, `content`, `info`);
-const showinfo = () => (qs(`.info`).textContent = "test");
-const hideinfo = () => (qs(`.info`).textContent = "");
-
-qs(`.f4`).addEventListener(`mouseover`, function (e) {
-  showinfo();
-});
-
-qs(`.f4`).addEventListener(`mouseout`, function (e) {
-  hideinfo();
-});
-
 function inputkeys(k) {
-  if (k == `?`) {
-    overlay = !overlay;
-    if (overlay) {
-      crdom(`overdev`, `content`, `overdev`);
-      crdom(`overclose`, `content`, `overclose`);
-      // - x button
-      qs(`.overclose`).textContent = "x";
-      overc();
-    }
-  }
-
   if (k == `e` || k == `π`) {
     eq = eq + k;
   }
