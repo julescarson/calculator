@@ -52,14 +52,13 @@ function crdom(name, parent, cn, text, cn2) {
   if (cn2) {
     newdiv.classList.add(cn2);
   }
-
   qs(`.${parent}`).append(newdiv);
   newdiv.textContent = text;
 }
 
 //create divs based on layout
 layout.forEach((e) => crdom(e.section, e.parent, null, null));
-ckeybar.forEach((k) => crdom(k, `fnbar`, `fkey`, k));
+ckeybar.forEach((k, index) => crdom(k, `fnbar`, `fkey`, k, `f${index}`));
 ckeys.forEach((k, index) => crdom(k, `numkeycont`, `btn`, k, `k${index}`));
 qs(`.xy`).innerHTML = `x<sup>y</sup>`;
 qs(`.statusbar`).innerHTML = `<img src="statusicons.png"></img>`;
@@ -157,7 +156,41 @@ qs(`.inputcont`).addEventListener(`click`, function (e) {
   inputkeys(e.target.textContent);
 });
 
+// -- ? button --
+let overlay = false;
+
+function overc() {
+  qs(`.overclose`).addEventListener(`click`, function () {
+    overlay = !overlay;
+    content.removeChild(qs(`.overdev`));
+    content.removeChild(qs(`.overclose`));
+  });
+}
+
+crdom(`info`, `content`, `info`);
+const showinfo = () => (qs(`.info`).textContent = "test");
+const hideinfo = () => (qs(`.info`).textContent = "");
+
+qs(`.f4`).addEventListener(`mouseover`, function (e) {
+  showinfo();
+});
+
+qs(`.f4`).addEventListener(`mouseout`, function (e) {
+  hideinfo();
+});
+
 function inputkeys(k) {
+  if (k == `?`) {
+    overlay = !overlay;
+    if (overlay) {
+      crdom(`overdev`, `content`, `overdev`);
+      crdom(`overclose`, `content`, `overclose`);
+      // - x button
+      qs(`.overclose`).textContent = "x";
+      overc();
+    }
+  }
+
   if (k == `e` || k == `π`) {
     eq = eq + k;
   }
@@ -186,7 +219,6 @@ function inputkeys(k) {
     eqprep(eq);
     runEquation(eqr);
     eqr = [];
-    arrn = [];
     eq = "";
   }
   //sqrt
@@ -213,7 +245,6 @@ function reset() {
   qs(`.ans`).textContent = ``;
   eqr = [];
   ARR = [];
-  arrn = [];
 }
 
 // --- math ---
@@ -273,7 +304,6 @@ let block = [];
 let result = new Number();
 let opAns = new Number();
 let orderlevel = 1;
-let arrn = [];
 
 const synerror = (er) => {
   qs(`.ans`).style.fontSize = "1.1rem";
@@ -512,12 +542,9 @@ function operate(arr, index, x, y, operator, hierarchy) {
   });
 }
 
-//reup times
-let last = true;
 let finalans;
+//reup times
 function reup(arr, result) {
-  console.log(`reup`);
-
   let start = stackpair[0];
   let end = stackpair[1];
   let length = end - start;
@@ -583,9 +610,12 @@ function reup(arr, result) {
     if (arr.length == 3) {
       let aa = ndecimal(arr[1]);
       showAns(aa);
+      finalans = aa;
     } else if (arr.length == 1) {
       let aa = ndecimal(arr[0]);
       showAns(aa);
+      finalans = aa;
+
       return;
     } else {
       arr.shift();
@@ -595,6 +625,7 @@ function reup(arr, result) {
   } else if (err == false) {
     let aa = ndecimal(arr[0]);
     showAns(aa);
+    finalans = aa;
   }
 }
 
