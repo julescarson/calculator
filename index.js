@@ -230,9 +230,9 @@ function inputkeys(k) {
   if (k == `xy`) {
     eq = eq + `^`;
   }
-  // if (qs(`.ans`).textContent != ``) {
-  //   reset();
-  // }
+  if (qs(`.ans`).textContent != ``) {
+    reset();
+  }
   if (k == `AC`) {
     reset();
   }
@@ -253,10 +253,10 @@ function inputkeys(k) {
     runEquation(eqr);
     eqr = [];
     eq = "";
-    if (finalans) {
-      eq = finalans.toString();
-      console.log({ eq });
-    }
+    // if (finalans) {
+    //   eq = finalans.toString();
+    //   console.log({ eq });
+    // }
   }
   //sqrt
   if (k == `√x`) {
