@@ -1,9 +1,32 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Eczar&family=Gentium+Plus&family=IBM+Plex+Mono:ital@1&family=Libre+Baskerville&family=Libre+Franklin&family=Proza+Libre&family=Roboto+Condensed:wght@300;400&family=Rubik&family=Taviraj&family=Trirong&family=Work+Sans&display=swap");
 
+/*small screen*/
+@media (max-width: 1300px) {
+    body {
+        font-size: 16px;
+    }
+  }
+/*med*/
+@media (min-width: 1301px) {
+    body {
+        font-size: 18px;
+    }
+  }
+  /*large*/
+@media (min-width: 1900px) {
+    body {
+        font-size: 24px;
+    }
+  }
+
 html {
     background-image: linear-gradient(109.6deg,
             rgba(156, 252, 248, 1) 11.2%,
             rgba(110, 123, 251, 1) 91.1%);
+            min-height:1vh;
+            min-width:1vh;
+            overflow:hidden;
+            
     -webkit-touch-callout: none;
     /* no select */
     -webkit-user-select: none;
@@ -11,7 +34,8 @@ html {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    min-height: 100%;
+    
+    
 }
 
 
@@ -20,7 +44,7 @@ body {
     display: flex;
     justify-content: center;
     font-family: "Roboto", sans-serif;
-    font-size: 19px;
+    /* font-size: 16px; */
     margin: 0px;
     padding: 0px;
 }
@@ -30,12 +54,19 @@ a {
 }
 
 a:hover {
-    color:black;
+    color:white;
 }
-.info {
-    
+a:hover img  {    
+    filter: invert(1);
+}
+a:hover p{
+    border-color:white;
+}
+
+.info {    
     color:darkslategray;
 }
+
 .info img {
     height:1.2em;
     width:1.2em;
@@ -43,16 +74,8 @@ a:hover {
     opacity:70%;
 }
 
-.p0:hover {    
-    color:black;
-    border-color:black;
-    filter: invert(1);
-}
-
-.p0 {
-   
-   width:100%;
-    
+.p0 {   
+   width:100%;    
 }
 
 
@@ -69,8 +92,7 @@ a:hover {
     border-top:1px solid rgba(133, 133, 133, 0.4);
     padding-top:2em;
     color:darkslategray;
-    border-radius:1%;
-    
+    border-radius:1%;    
 }
 
 .p0:hover ~ .p1 p{
