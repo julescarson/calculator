@@ -78,12 +78,8 @@ body {
     position: absolute;
     margin-left: 2em;
     margin-right: 2em;
-    font-size: 0.8em;
+    font-size: 0.7em;
     text-align: left;
-}
-
-.p2 {
-    text-align: justify;
 }
 
 /* - ? button - x button */

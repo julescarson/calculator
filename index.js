@@ -98,10 +98,14 @@ qs(`.p1`).innerHTML = `<p><i>behind the scenes...</i></p>`;
 // <br>✔ display the final answer
 // <br><br>✔ Make it pretty!</p>`;
 
+// qs(
+//   `.p2`
+// ).innerHTML = `<p>▸ paired brackets create (stack)<br>▸ solved indpendently<br>▸ substituted into equation<br>▸ equation re-parsed <br>▸ repeat until no stacks left<br>
+// ✔ final answer displayed!<br><br>... css to make it pretty!</p>`;
+
 qs(
   `.p2`
-).innerHTML = `<p>▸ paired brackets create (stack)<br>▸ solved indpendently<br>▸ substituted into equation<br>▸ equation re-parsed <br>▸ repeat until no stacks left<br>
-✔ final answer displayed!<br><br>... css to make it pretty!</p>`;
+).innerHTML = `<p>Parts of the equation within a pair of brackets (stacks) are treated as independent equations, solved, and substituted into the original equation. Repeat until no stacks left and final answer displayed.<br><br>... css to make it pretty!</p>`;
 
 function overlay(io) {
   if (io) {
