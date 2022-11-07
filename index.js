@@ -375,6 +375,11 @@ function runEquation(arr) {
   });
 
   for (let i = 0; i < ARR.length; i++) {
+    //divide by zero
+    if (ARR[i] == `/` && ARR[i + 1] == 0) {
+      synerror(`divide 0`);
+      return;
+    }
     //double negative
     if (ARR[i] == `-` && ARR[i - 1] == `-`) {
       ARR.splice(i - 1, 2, `+`);
