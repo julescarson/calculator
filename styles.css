@@ -82,6 +82,10 @@ body {
     text-align: left;
 }
 
+.p2 {
+    text-align: justify;
+}
+
 /* - ? button - x button */
 .q {
     position:absolute;   
