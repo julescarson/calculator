@@ -9,6 +9,6 @@ Run it and press the information button (i) (https://metamoniker.github.io/calcu
 
 The basic premise is that every bit of the equation within a pair of brackets is treated as its own independent equation, solved, and then re-embedded in the larger equation. The pairs, called stacks, have a hierarchy that determines order. Each time a stack is solved, the new equation gets passed to the parser until no stacks remain and final answer is displayed.
 
-The user inputs the equation as a string which is then split into an array of items based on whether the string character is a symbol or a number. Error checking happens throughout, mainly as an array. Although it may be useful to look further into regex for a problem like this. I wouldn't be surprised if I missed an edge case or too (please message me if you find one).
+The user inputs the equation as a string which is then split into an array of items based on whether the string character is a symbol or a number. Error checking happens throughout, mainly as an array. Although it may be useful to look further into regex for a problem like this. I wouldn't be surprised if I missed an edge case or two (please message me if you find one).
 
 The stack system itself was pretty challenging to come up with. Apparently there are all kinds of algorithms around this type of problem that I wasn't familiar with before starting. If I were to re-write this now I think it would look like a very different project, but I'm super happy with how it turned out and what I learned.

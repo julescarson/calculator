@@ -24,6 +24,14 @@ body {
     margin: 0px;
     padding: 0px;
 }
+a {
+    text-decoration:none;
+    color:darkslategray;
+}
+
+a:hover {
+    color:black;
+}
 .info {
     
     color:darkslategray;

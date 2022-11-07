@@ -82,11 +82,11 @@ for (let i = 0; i < 3; i++) {
 //github
 qs(
   ".p0"
-).innerHTML = `<p><img src="gh.png">&nbsp<i>github.com/metamoniker</i></img></p>`;
+).innerHTML = `<p><a href="https://github.com/metamoniker/calculator"><img src="gh.png">&nbsp<i>github.com/metamoniker</i></img></a></p>`;
 
-qs(`.p0`).onclick = () => {
-  window.location.assign("https://github.com/metamoniker/calculator");
-};
+// qs(`.p0`).onclick = () => {
+//   window.location.assign("https://github.com/metamoniker/calculator");
+// };
 //info
 qs(`.p1`).innerHTML = `<p><i>behind the scenes...</i></p>`;
 // qs(`.p2`).innerHTML = `<p>✔ parse equation
