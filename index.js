@@ -260,10 +260,6 @@ function inputkeys(k) {
   }
   //sqrt
   if (k == `√x`) {
-    if (finalans) {
-      eq = finalans.toString();
-      console.log({ eq });
-    }
     eq = `(${eq})^0.5`;
     eqprep(eq);
     runEquation(eqr);
