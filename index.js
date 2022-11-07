@@ -3,8 +3,8 @@ const content = document.querySelector(`.content`);
 
 const layout = [
   { section: `q`, parent: `content` },
-  { section: `info`, parent: `content` },
   { section: `overlay`, parent: `content` },
+  { section: `info`, parent: `overlay` },
   { section: `device`, parent: `content` },
   { section: `topbar`, parent: `device` },
   { section: `time`, parent: `topbar` },
@@ -66,13 +66,41 @@ ckeys.forEach((k, index) => crdom(k, `numkeycont`, `btn`, k, `k${index}`));
 qs(`.xy`).innerHTML = `x<sup>y</sup>`;
 qs(`.statusbar`).innerHTML = `<img src="statusicons.png"></img>`;
 
-// -- ? button x --
+// -- i button --
 let isactive = false;
 const showinfo = () => (qs(`.info`).textContent = "test");
 const hideinfo = () => (qs(`.info`).textContent = "");
 qs(`.q`).textContent = "i";
 qs(`.q`).classList.add(`qoff`);
 qs(`.overlay`).style.display = "none";
+qs(`.info`).style.display = "none";
+
+//overlay content
+for (let i = 0; i < 3; i++) {
+  crdom(`p${i}`, `info`, `p${i}`);
+}
+//github
+qs(
+  ".p0"
+).innerHTML = `<p><img src="gh.png">&nbsp<i>github.com/metamoniker</i></img></p>`;
+
+qs(`.p0`).onclick = () => {
+  window.location.assign("https://github.com/metamoniker/calculator");
+};
+//info
+qs(`.p1`).innerHTML = `<p><i>behind the scenes...</i></p>`;
+// qs(`.p2`).innerHTML = `<p>✔ parse equation
+// <br>✔ find bracket pairs (stack)
+// <br>✔ assign priority to stack
+// <br>✔ do math in current stack
+// <br>✔ make simplified equation
+// <br>✔ re-parse until 0 stacks
+// <br>✔ display the final answer
+// <br><br>✔ Make it pretty!</p>`;
+
+qs(
+  `.p2`
+).innerHTML = `<p>Parts of the equation within a pair of brackets (stacks) are treated as independent equations, solved, and re-embedded into the larger equation. Repeat until no stacks left and final answer displayed.<br><br>... css to make it pretty!</p>`;
 
 function overlay(io) {
   if (io) {
@@ -80,8 +108,10 @@ function overlay(io) {
     qs(`.q`).classList.add(`qoff`);
     qs(`.q`).classList.remove(`qon`);
     qs(`.device`).style.display = "unset";
+    qs(`.info`).style.display = "none";
   } else if (!io) {
     qs(`.overlay`).style.display = "unset";
+    qs(`.info`).style.display = "unset";
     qs(`.q`).classList.add(`qon`);
     qs(`.q`).classList.remove(`qoff`);
     qs(`.device`).style.display = "none";
@@ -218,9 +248,17 @@ function inputkeys(k) {
     runEquation(eqr);
     eqr = [];
     eq = "";
+    if (finalans) {
+      eq = finalans.toString();
+      console.log({ eq });
+    }
   }
   //sqrt
   if (k == `√x`) {
+    if (finalans) {
+      eq = finalans.toString();
+      console.log({ eq });
+    }
     eq = `(${eq})^0.5`;
     eqprep(eq);
     runEquation(eqr);
@@ -350,9 +388,32 @@ function runEquation(arr) {
       synerror(`empty ()`);
       return;
     }
+    //no double operators
+    let nd = [`*`, "/", "+"];
+    if (nd.includes(ARR[i]) && nd.includes(ARR[i - 1])) {
+      synerror(`operators [ ${ARR[i - 1]} ${ARR[i]} ]`);
+      return;
+    }
+    //no negative before operator
+    if (ARR[i - 1] == "-" && nd.includes(ARR[i])) {
+      synerror(`operators [ ${ARR[i - 1]} ${ARR[i]} ]`);
+      return;
+    }
+    //operator before negative
+    if (ARR[i] == `-`) {
+      if (nd.includes(ARR[i - 1])) {
+        if (typeof ARR[i + 1] == `number`) {
+          ARR.splice(i, 0, `(`);
+          ARR.push(`)`);
+          ARR.splice(i + 1, 2, ARR[i + 2] * -1);
+          console.log(ARR);
+        }
+      }
+    }
 
     //e, pi,
     let epie = (epi, mth) => {
+      i;
       if (ARR[i] == epi) {
         ARR.splice(i, 1, `(`, mth, `)`);
       }
@@ -380,6 +441,8 @@ function runEquation(arr) {
   //add brackets outer brackets
   ARR.unshift(`(`);
   ARR.push(")");
+
+  console.log(ARR);
 
   parseEq(ARR);
 }
