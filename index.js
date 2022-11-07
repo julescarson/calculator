@@ -225,9 +225,9 @@ function inputkeys(k) {
   if (k == `xy`) {
     eq = eq + `^`;
   }
-  if (qs(`.ans`).textContent != ``) {
-    reset();
-  }
+  // if (qs(`.ans`).textContent != ``) {
+  //   reset();
+  // }
   if (k == `AC`) {
     reset();
   }
