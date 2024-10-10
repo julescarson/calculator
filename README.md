@@ -5,7 +5,7 @@ This is the final project in Foundations TOP (https://www.theodinproject.com/pat
 'Completing' this is a little like completing an art project where you kind of just have to pick a brush stroke and call it done. The bare minimum of course being a working calculator! If I were to add anything it would be some fun stuff in CSS, like tilting based on mouse x,y or some glossy.shimmery display. At this point I'm dying to get started learning React/Ruby? hmm...
 
 How does it actually work though?
-Run it and press the information button (i) (https://metamoniker.github.io/calculator).
+Run it and press the information button (i) (https://julescarson.github.io/calculator).
 
 The basic premise is that every bit of the equation within a pair of brackets is treated as its own independent equation, solved, and then re-embedded in the larger equation. The pairs, called stacks, have a hierarchy that determines order. Each time a stack is solved, the new equation gets passed to the parser until no stacks remain and final answer is displayed.
 
